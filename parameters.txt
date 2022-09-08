@@ -1,0 +1,5 @@
+# What is the .fastq or .bcl file path? Example: C:\Users\Biolegio\example.fastq
+C:\Users\luche\Desktop\example.fastq
+
+# Is the plate created by using combinatorial indexing (1) or unique dual indexing (2)?
+1
