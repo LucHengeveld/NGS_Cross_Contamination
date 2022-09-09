@@ -1,3 +1,5 @@
+# TODO: add the parameter to use i5+i7, spike-ins+i5 or spike-ins+i7
+
 def retrieve_parameters(parameters_file):
     """
     Retrieves the parameters from the parameters textfile.

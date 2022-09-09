@@ -3,3 +3,6 @@ C:\Users\luche\Desktop\example.fastq
 
 # Is the plate created by using combinatorial indexing (1) or unique dual indexing (2)?
 1
+
+# Would you like to analyse I5 + I7 (1), spike-ins + I5 (2) or spike-ins + I7 (3)?
+1

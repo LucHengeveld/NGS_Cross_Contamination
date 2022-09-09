@@ -1,6 +1,7 @@
 def bcl_to_fastq(parameters):
     # TODO: Code voor bcl te converten naar fastq met bijbehorende
     #  parameters van het converten (bv min quality)
+    # https://support.illumina.com/content/dam/illumina-support/documents/documentation/software_documentation/bcl2fastq/bcl2fastq2-v2-20-software-guide-15051736-03.pdf
     fastq_file = "C:\\Users\\luche\\Desktop\\example.fastq"
     return fastq_file
 
