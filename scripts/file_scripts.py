@@ -9,10 +9,11 @@ def bcl_to_fastq(parameters):
 def fastq_reader(fastq_path):
     """
     Reads and saves the info from the .fastq file to a dictionary.
-    :param fastq_path: Path to the .fastq file
+    :param fastq_path: Path to the .fastq file.
     :return fastq_dict: Dictionary with the structure {barcode, [sequence1,
-                        sequence2, etc}.
+            sequence2, etc}.
     """
+    # TODO: Add possibility of incorrect barcodes (param max difference)
     # Creates an empty dictionary
     fastq_dict = {}
 
@@ -34,3 +35,12 @@ def fastq_reader(fastq_path):
 
     # Returns the fastq dictionary
     return fastq_dict
+
+
+def bar_seq_file_reader(bar_seq_file):
+    # TODO: Get file in correct format and change reader code
+    bar_seq_dict = {}
+    with open(bar_seq_file, "r") as file:
+        for line in file:
+            bar_seq_dict[line.split("\t")[0]] = line.replace("\n", "").split("\t")[1]
+    return bar_seq_dict
