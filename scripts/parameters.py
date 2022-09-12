@@ -31,12 +31,24 @@ def check_parameters(parameters_list):
         # If file has correct extension, it saves it to a variable
         file_extension = parameters_list[0].split(".")[1]
 
+    # Checks if the entered file has the correct extension
+    if parameters_list[1].split(".")[1] != "txt":
+        print("Error 1: Entered file has incorrect extension. Please enter a "
+              ".bcl or .fastq file path in parameters.txt")
+        exit(1)
+    else:
+        # If file has correct extension, it saves it to a variable
+        file_extension = parameters_list[0].split(".")[1]
+
     # Checks if the entered indexing value is correct
-    if int(parameters_list[1]) not in [1, 2]:
+    if parameters_list[2] not in ["1", "2"]:
         print("Error 2: Entered indexing value is incorrect. Please enter a "
               "1 if combinatorial indexing has been used or a 2 if unique dual "
               "indexing / non redundant indexing has been used.")
         exit(2)
+
+    # Param 3
+    # Param 4
 
     # If all parameters are entered correctly, return the file extension
     # and continue with the script

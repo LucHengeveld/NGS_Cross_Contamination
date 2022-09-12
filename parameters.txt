@@ -1,8 +1,17 @@
 # What is the .fastq or .bcl file path? Example: C:\Users\Biolegio\example.fastq
 C:\Users\luche\Desktop\example.fastq
 
+# What is the barcode and corresponding sequence file? Example: C:\Users\Biolegio\example.txt
+C:\Users\luche\Desktop\bar_seq.txt
+
 # Is the plate created by using combinatorial indexing (1) or unique dual indexing (2)?
 1
 
 # Would you like to analyse I5 + I7 (1), spike-ins + I5 (2) or spike-ins + I7 (3)?
 1
+
+# How many nucleotides are the found sequences allowed to differ from the original sequences?
+3
+
+# How many nucleotides are the found barcodes allowed to differ from the original barcodes?
+3
