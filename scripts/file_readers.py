@@ -1,3 +1,6 @@
+import openpyxl
+
+
 def bcl_to_fastq(parameters):
     # TODO: Code voor bcl te converten naar fastq met bijbehorende
     #  parameters van het converten (bv min quality)
@@ -11,9 +14,8 @@ def fastq_reader(fastq_path):
     Reads and saves the info from the .fastq file to a dictionary.
     :param fastq_path: Path to the .fastq file.
     :return fastq_dict: Dictionary with the structure {barcode, [sequence1,
-            sequence2, etc}.
+            sequence2, etc]}.
     """
-    # TODO: Add possibility of incorrect barcodes (param max difference)
     # Creates an empty dictionary
     fastq_dict = {}
 
@@ -37,10 +39,35 @@ def fastq_reader(fastq_path):
     return fastq_dict
 
 
-def bar_seq_file_reader(bar_seq_file):
-    # TODO: Get file in correct format and change reader code
-    bar_seq_dict = {}
-    with open(bar_seq_file, "r") as file:
-        for line in file:
-            bar_seq_dict[line.split("\t")[0]] = line.replace("\n", "").split("\t")[1]
-    return bar_seq_dict
+def barcode_file_reader(barcode_file, sequencing_method, spike_ins):
+    """
+    Retrieves the barcodes (and spike in sequences if spike_in parameter is
+    '2') from the entered Excel file.
+    :param barcode_file: Path to the Excel file.
+    :param sequencing_method: Parameter from parameters.txt.
+    :param spike_ins: Parameter from parameters.txt.
+    :return barcode_file_list: List with all barcodes from the Excel file.
+    :return barcode_file_dict: Dictionary with structure {barcode:well, [spike
+    seq1, spike seq2, etc]}
+    """
+    excel_reader = openpyxl.load_workbook(barcode_file)
+    sheet = excel_reader.active
+    barcode_file_list = []
+    barcode_file_dict = {}
+
+    if sequencing_method == "1":
+        i5 = 8
+    else:
+        i5 = 9
+    if spike_ins == "1":
+        for row in sheet.iter_rows(min_row=4, values_only=True):
+            barcode_file_list.append(row[i5] + "+" + row[4])
+        return barcode_file_list
+    else:
+        for row in sheet.iter_rows(min_row=4, values_only=True):
+            barcode = row[i5] + "+" + row[4]
+            if barcode in barcode_file_dict.keys():
+                barcode_file_dict[barcode][1].append(row[-1])
+            else:
+                barcode_file_dict[barcode] = [row[0], [row[-1]]]
+        return barcode_file_dict

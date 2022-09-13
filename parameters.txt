@@ -1,17 +1,28 @@
 # What is the .fastq or .bcl file path? Example: C:\Users\Biolegio\example.fastq
-C:\Users\luche\Desktop\example.fastq
+C:\Users\luche\Desktop\example_uniq.fastq
 
 # What is the barcode and corresponding sequence file? Example: C:\Users\Biolegio\example.txt
-C:\Users\luche\Desktop\bar_seq.txt
+C:\Users\luche\Desktop\barcode_files\barcode_uniq_no_spike.xlsx
 
 # Is the plate created by using combinatorial indexing (1) or unique dual indexing (2)?
+2
+
+# Would you like to analyse I5 + I7 (1) or spike-ins + I5 and I7 (2)?
 1
 
-# Would you like to analyse I5 + I7 (1), spike-ins + I5 (2) or spike-ins + I7 (3)?
+# How many nucleotides are the found barcodes allowed to differ from the original barcodes?
 1
 
 # How many nucleotides are the found sequences allowed to differ from the original sequences?
-3
+1
 
-# How many nucleotides are the found barcodes allowed to differ from the original barcodes?
-3
+# Which sequencer has been used?
+# (1) iSeq / MiniSeq / NextSeq / HiSeq3000 / HiSeq4000
+# (2) MiSeq / HiSeq2000-2500 / Novaseq
+1
+
+# In which folder would you like to save the output file?
+C:\Users\luche\Desktop\
+
+# What name would you like to use for the output file?
+output
