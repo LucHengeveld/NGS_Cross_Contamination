@@ -1,11 +1,5 @@
-# Manier om sequenties te vergelijken met max afwijkingen, misschien op deze manier clusteren?
+# Imports required packages
 from Levenshtein import distance
-# string1 = "CCTACGGGCGGCAGCAGTGGGGA"
-# string2 = "AAATCGGGCGGCAGCAGTGGGGA"
-# print(distance(string1, string2) <= 3)
-
-# Of eventueel met vsearch?
-# https://github.com/torognes/vsearch
 
 
 def check_seq_combinatorial(fastq_dict, bar_seq_dict, max_difference):

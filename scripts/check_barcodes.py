@@ -1,18 +1,26 @@
 from Levenshtein import distance
 
 
-def barc_no_spike(fastq_dict, barcode_file_data, diff_bar_nucl):
+def comb_barc_no_spike(fastq_dict, barcode_file_data, diff_bar_nucl):
     """
     Checks if found barcode exists in the original barcodes file.
     :param fastq_dict: Dictionary with the structure {barcode, [sequence1,
             sequence2, etc]}.
     :param barcode_file_data: List with all barcodes from the Excel file.
     :param diff_bar_nucl: Parameter from parameters.txt.
-    :return unknown_barcodes: List with all fastq barcodes that have not been
-    found in the original barcode Excel file.
+    :return unknown_barcodes: Dictionary with all fastq barcodes that have not
+            been found in the original barcode Excel file.
+            Structure: {barcode: occurrences}.
+    :return correct_barcodes: Dictionary with all barcodes from the original
+            barcode Excel file and the amount of times they have been found in the
+            fastq file. Structure: {barcode: occurrences}.
     """
+    # TODO: Check if barcode i5+i7 are mismatched or if one of them contains
+    #  unknown barcode (like in def uniq_barc_no_spike)
+    # TODO: Add parameter to enable or disable the diff_bar_nucl param, speed
+    #  increases if distance function is not used
     # Creates an empty list
-    unknown_barcodes = []
+    unknown_barcodes = {}
     correct_barcodes = {}
     for barcode in barcode_file_data:
         correct_barcodes[barcode] = 0
@@ -27,48 +35,68 @@ def barc_no_spike(fastq_dict, barcode_file_data, diff_bar_nucl):
                 counter += 1
                 correct_barcodes[original_barcode] += 1
         if counter == 0:
-            # Adds barcode to list if is has not been found
-            unknown_barcodes.append(fastq_barcode)
+            # Adds barcode and counter to dictionary if is has not been
+            # found
+            if fastq_barcode in unknown_barcodes.keys():
+                unknown_barcodes[fastq_barcode] += 1
+            else:
+                unknown_barcodes[fastq_barcode] = 1
 
-    # Returns the unknown barcodes
+    # Returns the unknown_barcodes and correct_barcodes
     return unknown_barcodes, correct_barcodes
 
 
-def uni_barc_no_spike(fastq_dict, barcode_file_data, diff_bar_nucl,
-                      unknown_barcodes):
-    # TODO: Docstrings / comments
-    # structure {found barcode: [original i5 barcode combination,
-    # original i7 barcode combination]}
+def uniq_barc_no_spike(barcode_file_data, fastq_dict, diff_bar_nucl):
+    """
+    Checks and counts the different possible i5 + i7 combinations.
+    :param barcode_file_data: List with all barcodes from the Excel file.
+    :param fastq_dict: Dictionary with the structure {barcode, [sequence1,
+            sequence2, etc]}.
+    :param diff_bar_nucl: Parameter from parameters.txt.
+    :return i5_i7_combinations: Dictionary containing all possible i5 + i7
+            combinations and its amount of occurrences in the fastq file.
+            Structure: {i5: {i7: counter}, {i7, counter}}.
+    :return unknown_barcodes: List with all unknown barcode combinations from
+            the fastq file.
+    """
+    # TODO: Possible improvement: split unknown barcodes into unknown i5,
+    #  unknown i7 and both unknown. Add difference nucleotide barcode param.
+    # Creates empty lists
     correct_i5 = []
     correct_i7 = []
-    incorrect_combinations = []
-    unknown_i5 = []
-    unknown_i7 = []
 
-    # Split the barcodes into separate i5 and i7
-    unknown_i5_i7 = [barcode.split("+") for barcode in unknown_barcodes]
-
+    # Splits the barcodes from the excel file into i5 and i7
     for barcode in barcode_file_data:
-        correct_i5.append(barcode.split("+")[0])
-        correct_i7.append(barcode.split("+")[1])
+        i5, i7 = barcode.split("+")
+        correct_i5.append(i5)
+        correct_i7.append(i7)
 
-    unknown_barcodes.clear()
+    # Creates an empty dictionary
+    i5_i7_combinations = {}
 
-    for unknown_combination in unknown_i5_i7:
-        i5 = unknown_combination[0]
-        i7 = unknown_combination[1]
-        if i5 in correct_i5:
-            if i7 in correct_i7:
-                # print("Both i5 and i7 have been found. Barcodes do not match.", i5, i7)
-                incorrect_combinations.append([i5, i7])
+    # Creates a dictionary with every possible i5 + i7 combination and
+    # set the amount of occurrences to 0
+    for i5 in correct_i5:
+        for i7 in correct_i7:
+            if i5 not in i5_i7_combinations.keys():
+                i5_i7_combinations[i5] = {i7: 0}
             else:
-                # print("i7 is unknown:", i7, i5+"+"+i7)
-                unknown_i7.append([i5, i7])
-        elif i7 in correct_i7:
-            # print("i5 is unknown:", i5, i5+"+"+i7)
-            unknown_i5.append([i5, i7])
-        else:
-            # print("i5", i5, "and i7", i7, "are unknown.")
-            unknown_barcodes.append([i5, i7])
+                i5_i7_combinations[i5][i7] = 0
 
-    return incorrect_combinations, unknown_barcodes, unknown_i5, unknown_i7, correct_i5, correct_i7
+    # Creates an empty list
+    unknown_barcodes = []
+
+    # Checks if found i5 and i7 barcodes exist in Excel file
+    for barcode in fastq_dict.keys():
+        i5, i7 = barcode.split("+")
+        # If the i5 and i7 barcode exist in Excel file, increases the
+        # occurrences counter of that specific barcode with 1
+        if i5 in correct_i5 and i7 in correct_i7:
+            i5_i7_combinations[i5][i7] += 1
+        else:
+            # If i5 + i7 combination is unknown, it adds the barcode to
+            # a list
+            unknown_barcodes.append(barcode)
+
+    # Returns i5_i7_combinations and unknown_barcodes to main function
+    return i5_i7_combinations, unknown_barcodes

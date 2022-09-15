@@ -1,5 +1,3 @@
-# TODO: add the parameter to use i5+i7, spike-ins+i5 or spike-ins+i7
-
 def retrieve_parameters(parameters_file):
     """
     Retrieves the parameters from the parameters textfile.
@@ -21,7 +19,10 @@ def retrieve_parameters(parameters_file):
 
 def check_parameters(parameters_list):
     # TODO: Add docstrings to this function.
-    # TODO: Add new parameters to this function.
+    # TODO: Add new parameters from txt file to this function.
+    # TODO: Error to check if all parameters have been entered.
+    # TODO: Maybe change parameters list to a dictionary
+
     # Checks if the entered fastq/bcl file has the correct extension
     if not parameters_list[0].split(".")[1] in ["bcl", "fastq"]:
         print("Error 1: Entered file has incorrect extension. Please enter a "
@@ -75,8 +76,8 @@ def check_parameters(parameters_list):
               "been used.")
         exit(6)
 
-    # TODO: Parameter output folder check + connect to file_writers.py functions
-    # TODO: Parameter output file name + connect to file_writers.py functions
+    # TODO: Parameter output folder check + connect to file_writers.py functions.
+    # TODO: Parameter output file name + connect to file_writers.py functions.
 
     # If all parameters are entered correctly, return the file extension
     # and continue with the script

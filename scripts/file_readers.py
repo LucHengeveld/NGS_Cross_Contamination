@@ -2,8 +2,7 @@ import openpyxl
 
 
 def bcl_to_fastq(parameters):
-    # TODO: Code voor bcl te converten naar fastq met bijbehorende
-    #  parameters van het converten (bv min quality)
+    # TODO: Code for converting .bcl to .fastq and its parameters (like min quality)
     # https://support.illumina.com/content/dam/illumina-support/documents/documentation/software_documentation/bcl2fastq/bcl2fastq2-v2-20-software-guide-15051736-03.pdf
     fastq_file = "C:\\Users\\luche\\Desktop\\example.fastq"
     return fastq_file
@@ -16,6 +15,11 @@ def fastq_reader(fastq_path):
     :return fastq_dict: Dictionary with the structure {barcode, [sequence1,
             sequence2, etc]}.
     """
+    # TODO: Increase fastq_reader speed by creating spike in and no spike-in
+    #  split in function. No spike-in requires no sequence.
+    # TODO: Build in max difference barcode sequence param if spike-in has been
+    #  used.
+
     # Creates an empty dictionary
     fastq_dict = {}
 
@@ -48,26 +52,39 @@ def barcode_file_reader(barcode_file, sequencing_method, spike_ins):
     :param spike_ins: Parameter from parameters.txt.
     :return barcode_file_list: List with all barcodes from the Excel file.
     :return barcode_file_dict: Dictionary with structure {barcode:well, [spike
-    seq1, spike seq2, etc]}
+            seq1, spike seq2, etc]}.
     """
+    # Loads in the Excel barcode file
     excel_reader = openpyxl.load_workbook(barcode_file)
     sheet = excel_reader.active
+
+    # Creates an empty list and dictionary
     barcode_file_list = []
     barcode_file_dict = {}
 
+    # Checks sequencing method to retrieve correct i5 column
     if sequencing_method == "1":
         i5 = 8
     else:
         i5 = 9
+
+    # Checks spike in parameter
     if spike_ins == "1":
+        # Retrieves barcodes from the Excel file
         for row in sheet.iter_rows(min_row=4, values_only=True):
             barcode_file_list.append(row[i5] + "+" + row[4])
+
+        # Returns the barcode_file_list
         return barcode_file_list
+
     else:
+        # Retrieves barcodes and spike-in sequences from the Excel file
         for row in sheet.iter_rows(min_row=4, values_only=True):
             barcode = row[i5] + "+" + row[4]
             if barcode in barcode_file_dict.keys():
                 barcode_file_dict[barcode][1].append(row[-1])
             else:
                 barcode_file_dict[barcode] = [row[0], [row[-1]]]
+
+        # Returns the barcode_file_dict
         return barcode_file_dict
