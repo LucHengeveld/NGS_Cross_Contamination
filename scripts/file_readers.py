@@ -1,10 +1,10 @@
 import openpyxl
 
 
-def bcl_to_fastq(parameters):
-    # TODO: Code for converting .bcl to .fastq and its parameters (like min quality)
+def bcl_to_fastq(parameters_dict):
+    # TODO: Code for converting .bcl to .fastq and its parameters (like min quality). Not sure if doable due to requirements for illumina tool
     # https://support.illumina.com/content/dam/illumina-support/documents/documentation/software_documentation/bcl2fastq/bcl2fastq2-v2-20-software-guide-15051736-03.pdf
-    fastq_file = "C:\\Users\\luche\\Desktop\\example.fastq"
+    fastq_file = ""
     return fastq_file
 
 
@@ -18,7 +18,7 @@ def fastq_reader(fastq_path):
     # TODO: Increase fastq_reader speed by creating spike in and no spike-in
     #  split in function. No spike-in requires no sequence.
     # TODO: Build in max difference barcode sequence param if spike-in has been
-    #  used.
+    #  used. (yes --> return dict, no --> return list)
 
     # Creates an empty dictionary
     fastq_dict = {}

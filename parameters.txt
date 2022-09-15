@@ -1,11 +1,11 @@
 # What is the .fastq or .bcl file path? Example: C:\Users\Biolegio\example.fastq
-C:\Users\luche\Desktop\fastq_files\example_comb.fastq
+C:\Users\luche\Desktop\fastq_files\example_uniq.fastq
 
-# What is the barcode and corresponding sequence file? Example: C:\Users\Biolegio\example.txt
-C:\Users\luche\Desktop\barcode_files\barcode_comb_no_spike.xlsx
+# What is the barcode (and spike-in sequence) file? Example: C:\Users\Biolegio\example.txt
+C:\Users\luche\Desktop\barcode_files\barcode_uniq_no_spike.xlsx
 
 # Is the plate created by using combinatorial indexing (1) or unique dual indexing (2)?
-1
+2
 
 # Would you like to analyse I5 + I7 (1) or spike-ins + I5 and I7 (2)?
 1
@@ -13,8 +13,9 @@ C:\Users\luche\Desktop\barcode_files\barcode_comb_no_spike.xlsx
 # How many nucleotides are the found barcodes allowed to differ from the original barcodes?
 1
 
-# How many nucleotides are the found sequences allowed to differ from the original sequences?
-1
+# How many nucleotides are the found spike-in sequences allowed to differ from
+# the original sequences? Enter a 0 if you are not using spike-in sequences
+0
 
 # Which sequencer has been used?
 # (1) iSeq / MiniSeq / NextSeq / HiSeq3000 / HiSeq4000
