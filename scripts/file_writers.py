@@ -55,11 +55,11 @@ def uniq_no_spike_output(i5_i7_combinations, unknown_barcodes, output_file):
     :return: Excel output file at entered location.
     """
     # TODO: Add column for unknown barcodes.
-    # TODO: Possible improvement: Add heatmap and make A/B and 1/2 bold.
+    # TODO: Possible improvement: Add heatmap and make col A/B and row 1/2 bold.
+    # Heatmap: https://xlsxwriter.readthedocs.io/working_with_pandas.html
 
     # Create base layout in 2d list for Excel output file
-    excel_2d_list = [["", "", "i7 barcodes"],
-                      ["", ""]]
+    excel_2d_list = [["", "", "i7 barcodes"], ["", ""]]
 
     # Variable to add i7 barcodes to the array if they haven't been
     # added yet

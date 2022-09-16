@@ -11,7 +11,7 @@ def retrieve_parameters(parameters_file):
     parameters_dict = {}
 
     keys_list = ["fastq_file_path", "barcode_file_path", "indexing",
-                 "spike-ins", "diff_barc", "diff_seq", "sequencer",
+                 "spike_ins", "diff_barc", "diff_seq", "sequencer",
                  "output_dir", "output_filename"]
 
     counter = 0
@@ -53,7 +53,7 @@ def check_parameters(parameters_dict):
         exit(3)
 
     # Checks if entered analysis value is correct
-    if parameters_dict["spike-ins"] not in ["1", "2"]:
+    if parameters_dict["spike_ins"] not in ["1", "2"]:
         print("Error 4: Entered analysis value is incorrect. Please enter a "
               "'1' to analyse I5 + I7 or a '2' to analyse spike-ins + I5 and "
               "I7.")

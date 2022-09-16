@@ -11,7 +11,7 @@ C:\Users\luche\Desktop\barcode_files\barcode_uniq_no_spike.xlsx
 1
 
 # How many nucleotides are the found barcodes allowed to differ from the original barcodes?
-1
+0
 
 # How many nucleotides are the found spike-in sequences allowed to differ from
 # the original sequences? Enter a 0 if you are not using spike-in sequences
@@ -26,4 +26,4 @@ C:\Users\luche\Desktop\barcode_files\barcode_uniq_no_spike.xlsx
 C:\Users\luche\Desktop\output\
 
 # What name would you like to use for the output file?
-output
+test

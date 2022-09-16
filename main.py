@@ -13,34 +13,36 @@ if __name__ == "__main__":
 
     # If the file has a bcl file extension, it will convert it to a
     # .fastq file and calls the fastq_reader function
-    if file_extension == "bcl":
-        fastq_file = fr.bcl_to_fastq(parameters_dict)
-        fastq_dict = fr.fastq_reader(fastq_file)
-    else:
-        fastq_dict = fr.fastq_reader(parameters_dict["fastq_file_path"])
+    # if file_extension == "bcl":
+    #     fastq_file = fr.bcl_to_fastq(parameters_dict)
+    #     fastq_dict = fr.fastq_reader(fastq_file)
+    # else:
+    #     fastq_dict = fr.fastq_reader(parameters_dict["fastq_file_path"])
 
     # Retrieves the data from the barcode Excel file
     barcode_file_data = fr.barcode_file_reader(
         parameters_dict["barcode_file_path"],
         parameters_dict["sequencer"],
-        parameters_dict["spike-ins"])
+        parameters_dict["spike_ins"])
 
-    output_file = parameters_dict["output_dir"] + parameters_dict[
-        "output_filename"] + ".xlsx"
-
-    if parameters_dict["spike-ins"] == "1":
+    if parameters_dict["spike_ins"] == "1":
+        fastq_data = fr.fastq_reader_no_spike(
+            parameters_dict["fastq_file_path"])
+        output_file = parameters_dict["output_dir"] + parameters_dict[
+            "output_filename"] + ".xlsx"
         if parameters_dict["indexing"] == "1":
             # Combinatorial i5+i7:
             # Retrieve the unknown barcodes
             unknown_barcodes, correct_barcodes = cb.comb_barc_no_spike(
-                fastq_dict, barcode_file_data, parameters_dict["diff_barc"])
+                fastq_data, barcode_file_data, parameters_dict["diff_barc"])
             # Write data to output file
             fw.comb_no_spike_output(correct_barcodes, unknown_barcodes,
                                     output_file)
         else:
             # Unique i5 + i7
-            i5_i7_combinations, unknown_barcodes = cb.uniq_barc_no_spike(
-                barcode_file_data, fastq_dict, parameters_dict["diff_barc"])
+            i5_i7_combinations, unknown_i5, unknown_i7, unknown_barcodes = \
+                cb.uniq_barc_no_spike(barcode_file_data, fastq_data,
+                                      parameters_dict["diff_barc"])
 
             # Write data to output file
             fw.uniq_no_spike_output(i5_i7_combinations, unknown_barcodes,
