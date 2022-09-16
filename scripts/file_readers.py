@@ -12,8 +12,7 @@ def fastq_reader_no_spike(fastq_path):
     """
     Reads and saves the info from the .fastq file to a dictionary.
     :param fastq_path: Path to the .fastq file.
-    :return fastq_dict: Dictionary with the structure {barcode, [sequence1,
-            sequence2, etc]}.
+    :return fastq_data: List with the structure [barcode 1, barcode2, etc].
     """
     # TODO: Increase fastq_reader speed by creating spike in and no spike-in
     #  split in function. No spike-in requires no sequence.
