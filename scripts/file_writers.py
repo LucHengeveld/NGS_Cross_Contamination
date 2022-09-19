@@ -1,7 +1,8 @@
 import xlsxwriter
 
 
-def no_spike_output(i5_i7_combinations, unknown_barcodes, output_file, i5_i7_loc, indexing):
+def no_spike_output(i5_i7_combinations, unknown_barcodes, output_file,
+                    i5_i7_loc, indexing):
     """
     Creates the output Excel file for unique dual (non redundant) indexing with
     no spike-in sequence.
@@ -11,6 +12,10 @@ def no_spike_output(i5_i7_combinations, unknown_barcodes, output_file, i5_i7_loc
     :param unknown_barcodes: List with all unknown barcode combinations from
             the fastq file.
     :param output_file: Output file path.
+    :param i5_i7_loc: Dictionary containing the i5 and i7 barcodes with their
+            corresponding well locations. Dictionary has the structure:
+            {i5: ["A" {i7: 1, i7: 2}]}.
+    :param indexing: Parameter of the used indexing method.
     :return: Excel output file at entered location.
     """
     # TODO: Add column for unknown barcodes.

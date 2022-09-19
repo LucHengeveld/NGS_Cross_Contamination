@@ -37,17 +37,22 @@ if __name__ == "__main__":
             cb.barc_no_spike(barcode_file_data, fastq_data,
                              parameters_dict["diff_barc"])
 
-        # Retrieve barcode locations
-        i5_i7_loc = cb.retrieve_barcode_location(barcode_file_data)
-
         # Saves the output file location and name to a variable
         output_file = parameters_dict["output_dir"] + parameters_dict[
             "output_filename"] + ".xlsx"
 
-        # Write data to Excel output file
-        # TODO: Fix unique dual indexing writer
-        fw.no_spike_output(i5_i7_combinations, unknown_barcodes, output_file,
-                           i5_i7_loc, parameters_dict["indexing"])
+        if parameters_dict["indexing"] == "1":
+            # Retrieve barcode well locations
+            i5_i7_loc = cb.retrieve_barcode_location(barcode_file_data)
+
+            # Write data to Excel output file
+            fw.no_spike_output(i5_i7_combinations, unknown_barcodes,
+                               output_file, i5_i7_loc,
+                               parameters_dict["indexing"])
+        else:
+            # Write data to Excel output file
+            fw.no_spike_output(i5_i7_combinations, unknown_barcodes,
+                               output_file, [], parameters_dict["indexing"])
 
     elif parameters_dict["indexing"] == "1":
         # combinatorial spike-ins i5+i7

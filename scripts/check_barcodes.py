@@ -107,14 +107,28 @@ def barc_no_spike(barcode_file_data, fastq_data, diff_bar_nucl):
 
 
 def retrieve_barcode_location(barcode_file_data):
-    # TODO: Docstrings and comments
+    """
+    Retrieves the well locations of the barcodes from the combinatorial
+    indexing plate.
+    :param barcode_file_data: List with all barcodes from the Excel file.
+    :return i5_i7_loc: Dictionary containing the i5 and i7 barcodes with their
+            corresponding well locations. Dictionary has the structure:
+            {i5: ["A" {i7: 1, i7: 2}]}
+    """
+    # Creates an empty dictionary
     i5_i7_loc = {}
+
+    # Loops through the barcodes from the entered barcode Excel file
     for barcode in barcode_file_data:
         i5_loc = barcode[0][0]
         i7_loc = barcode[0][1]
         i5_bar, i7_bar = barcode[1].split("+")
+
+        # Adds the barcodes and their well locations to the dictionary
         if i5_bar not in i5_i7_loc:
             i5_i7_loc[i5_bar] = [i5_loc, {i7_bar: i7_loc}]
         else:
             i5_i7_loc[i5_bar][1].update({i7_bar: i7_loc})
+
+    # Returns the i5_i7_loc dictionary
     return i5_i7_loc
