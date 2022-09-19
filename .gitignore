@@ -301,4 +301,4 @@ cython_debug/
 # End of https://www.toptal.com/developers/gitignore/api/python,pycharm,visualstudiocode
 
 # Ignore the output directory
-./output
+/output/
