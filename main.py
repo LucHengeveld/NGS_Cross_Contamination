@@ -2,9 +2,12 @@
 from scripts import file_readers as fr, parameters as pm, \
     calculate_contamination as cc, check_barcodes as cb, file_writers as fw
 
-# TODO: Docstrings / comments.
-# Main function of the script, calls the different functions
+
 if __name__ == "__main__":
+    # TODO: Docstrings / comments.
+    # TODO: Error: File doesn't exist
+    # TODO: Error: try except around file reader
+    # Main function of the script, calls the different functions
     # Saves the user entered parameters in a list
     parameters_dict = pm.retrieve_parameters("parameters.txt")
 
@@ -33,7 +36,7 @@ if __name__ == "__main__":
 
         # Compare all fastq barcode sequences to the ones from the
         # input Excel file
-        i5_i7_combinations, unknown_i5, unknown_i7, unknown_barcodes = \
+        i5_i7_combinations, unknown_barcodes, unknown_i5, unknown_i7 = \
             cb.barc_no_spike(barcode_file_data, fastq_data,
                              parameters_dict["diff_barc"])
 
@@ -47,12 +50,13 @@ if __name__ == "__main__":
 
             # Write data to Excel output file
             fw.no_spike_output(i5_i7_combinations, unknown_barcodes,
-                               output_file, i5_i7_loc,
+                               unknown_i5, unknown_i7, output_file, i5_i7_loc,
                                parameters_dict["indexing"])
         else:
             # Write data to Excel output file
             fw.no_spike_output(i5_i7_combinations, unknown_barcodes,
-                               output_file, [], parameters_dict["indexing"])
+                               unknown_i5, unknown_i7, output_file, [],
+                               parameters_dict["indexing"])
 
     elif parameters_dict["indexing"] == "1":
         # combinatorial spike-ins i5+i7
@@ -61,6 +65,7 @@ if __name__ == "__main__":
         # unique i5+i7 spike-ins
         pass
 
+        # Unfinished spike-ins code:
         # Spike in sequences:
         # # Checks which sequences are contaminated
         # contaminated_sequences = cc.check_seq_combinatorial(fastq_dict,

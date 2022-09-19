@@ -1,16 +1,20 @@
 import xlsxwriter
 
 
-def no_spike_output(i5_i7_combinations, unknown_barcodes, output_file,
-                    i5_i7_loc, indexing):
+def no_spike_output(i5_i7_combinations, unknown_barcodes, unknown_i5,
+                    unknown_i7, output_file, i5_i7_loc, indexing):
     """
     Creates the output Excel file for unique dual (non redundant) indexing with
     no spike-in sequence.
     :param i5_i7_combinations: Dictionary containing all possible i5 + i7
             combinations and its amount of occurrences in the fastq file.
             Structure: {i5: {i7: counter}, {i7, counter}}.
-    :param unknown_barcodes: List with all unknown barcode combinations from
-            the fastq file.
+    :param unknown_barcodes: Dictionary with all unknown barcode combinations
+            from the fastq file.
+    :param unknown_i5: Dictionary with all unknown i5 barcodes from the fastq
+            file.
+    :param unknown_i7: Dictionary with all unknown i7 barcodes from the fastq
+            file.
     :param output_file: Output file path.
     :param i5_i7_loc: Dictionary containing the i5 and i7 barcodes with their
             corresponding well locations. Dictionary has the structure:
@@ -18,9 +22,9 @@ def no_spike_output(i5_i7_combinations, unknown_barcodes, output_file,
     :param indexing: Parameter of the used indexing method.
     :return: Excel output file at entered location.
     """
-    # TODO: Add column for unknown barcodes.
-    # TODO: Possible improvement: Add heatmap and make col A/B and row 1/2 bold.
+    # TODO: Possible improvement: Add heatmap.
     # Heatmap: https://xlsxwriter.readthedocs.io/working_with_pandas.html
+    # TODO: Split this function into multiple ones.
 
     # Create base layout in 2d list for Excel output file
     excel_2d_list = [["", "i7 barcodes"], ["", ""]]
@@ -59,14 +63,71 @@ def no_spike_output(i5_i7_combinations, unknown_barcodes, output_file,
     # Calculates the column totals
     column_tot = excel_2d_list[2][2:-1]
     for row in range(3, len(excel_2d_list)):
-        for col in range(2, len(excel_2d_list[row])-1):
-            column_tot[col-2] += excel_2d_list[row][col]
+        for col in range(2, len(excel_2d_list[row]) - 1):
+            column_tot[col - 2] += excel_2d_list[row][col]
 
     # Adds the column total values to the Excel 2d list
     excel_2d_list[-1] += column_tot
 
     # Writes the output to the Excel file
     with xlsxwriter.Workbook(output_file) as workbook:
-        worksheet = workbook.add_worksheet()
-        for row_num, data in enumerate(excel_2d_list):
-            worksheet.write_row(row_num, 0, data)
+        contamination_table = workbook.add_worksheet("Contamination Table")
+
+        # Creates bold and green background color format
+        bold = workbook.add_format({'bold': True})
+        green_bg = workbook.add_format({'bg_color': '#adebad'})
+
+        # Saves the amount of columns to a variable
+        cols = len(excel_2d_list[1])
+
+        # Set column width
+        contamination_table.set_column(0, 1, 10.3)
+        contamination_table.set_column(2, cols, 9.3)
+
+        # Loops through the data and writes it to an Excel sheet with
+        # the correct cell format (bold / green background)
+        for i in range(len(excel_2d_list)):
+            for j in range(len(excel_2d_list[i])):
+                if i in [0, 1] or j in [0, 1]:
+                    contamination_table.write(i, j, excel_2d_list[i][j], bold)
+                elif i == j and 1 < i < len(excel_2d_list) - 1:
+                    contamination_table.write(i, j, excel_2d_list[i][j],
+                                              green_bg)
+                else:
+                    contamination_table.write(i, j, excel_2d_list[i][j])
+
+        # Writes all unknown i5 + i7 combinations to an Excel sheet
+        unknown_i5_i7_sheet = workbook.add_worksheet("Unknown i5+i7")
+        unknown_i5_i7_sheet.set_column("A:A", 23.5)
+        unknown_i5_i7_sheet.set_column("B:B", 11.7)
+        unknown_i5_i7_sheet.write_row(0, 0, ["Unknown i5 + i7 barcodes:",
+                                             "Occurrences:"], bold)
+        for row in range(len(unknown_barcodes.keys())):
+            unknown_i5_i7_sheet.write_row(row + 1, 0,
+                                          [list(unknown_barcodes.keys())[row],
+                                           unknown_barcodes[list(
+                                               unknown_barcodes.keys())[row]]])
+
+        # Writes all unknown i5 barcodes to an Excel sheet
+        unknown_i5_sheet = workbook.add_worksheet("Unknown i5")
+        unknown_i5_sheet.set_column("A:A", 20)
+        unknown_i5_sheet.set_column("B:B", 11.7)
+        unknown_i5_sheet.write_row(0, 0, ["Unknown i5 barcodes:",
+                                          "Occurrences:"], bold)
+        for row in range(len(unknown_i5.keys())):
+            unknown_i5_sheet.write_row(row + 1, 0,
+                                       [list(unknown_i5.keys())[row],
+                                        unknown_i5[list(unknown_i5.keys()
+                                                        )[row]]])
+
+        # Writes all unknown i7 barcodes to an Excel sheet
+        unknown_i7_sheet = workbook.add_worksheet("Unknown i7")
+        unknown_i7_sheet.set_column("A:A", 20)
+        unknown_i7_sheet.set_column("B:B", 11.7)
+        unknown_i7_sheet.write_row(0, 0, ["Unknown i7 barcodes:",
+                                          "Occurrences:"], bold)
+        for row in range(len(unknown_i7.keys())):
+            unknown_i7_sheet.write_row(row + 1, 0,
+                                       [list(unknown_i7.keys())[row],
+                                        unknown_i7[list(unknown_i7.keys()
+                                                        )[row]]])
