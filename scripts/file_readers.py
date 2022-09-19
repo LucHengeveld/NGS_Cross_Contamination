@@ -14,11 +14,6 @@ def fastq_reader_no_spike(fastq_path):
     :param fastq_path: Path to the .fastq file.
     :return fastq_data: List with the structure [barcode 1, barcode2, etc].
     """
-    # TODO: Increase fastq_reader speed by creating spike in and no spike-in
-    #  split in function. No spike-in requires no sequence.
-    # TODO: Build in max difference barcode sequence param if spike-in has been
-    #  used. (yes --> return dict, no --> return list)
-
     # Creates an empty dictionary
     fastq_data = []
 
@@ -61,8 +56,7 @@ def barcode_file_reader(barcode_file, sequencing_method, spike_ins):
     if spike_ins == "1":
         # Retrieve barcodes from the Excel file
         for row in sheet.iter_rows(min_row=4, values_only=True):
-            barcode_file_list.append(row[i5] + "+" + row[4])
-
+            barcode_file_list.append([row[0], row[i5] + "+" + row[4]])
         # Returns the barcode_file_list
         return barcode_file_list
 

@@ -25,28 +25,29 @@ if __name__ == "__main__":
         parameters_dict["sequencer"],
         parameters_dict["spike_ins"])
 
+    # Combinatorial and unique dual indexing without spike-in sequence
     if parameters_dict["spike_ins"] == "1":
+        # Retrieve barcodes from fastq file
         fastq_data = fr.fastq_reader_no_spike(
             parameters_dict["fastq_file_path"])
+
+        # Compare all fastq barcode sequences to the ones from the
+        # input Excel file
+        i5_i7_combinations, unknown_i5, unknown_i7, unknown_barcodes = \
+            cb.barc_no_spike(barcode_file_data, fastq_data,
+                             parameters_dict["diff_barc"])
+
+        # Retrieve barcode locations
+        i5_i7_loc = cb.retrieve_barcode_location(barcode_file_data)
+
+        # Saves the output file location and name to a variable
         output_file = parameters_dict["output_dir"] + parameters_dict[
             "output_filename"] + ".xlsx"
-        if parameters_dict["indexing"] == "1":
-            # Combinatorial i5+i7:
-            # Retrieve the unknown barcodes
-            unknown_barcodes, correct_barcodes = cb.comb_barc_no_spike(
-                fastq_data, barcode_file_data, parameters_dict["diff_barc"])
-            # Write data to output file
-            fw.comb_no_spike_output(correct_barcodes, unknown_barcodes,
-                                    output_file)
-        else:
-            # Unique i5 + i7
-            i5_i7_combinations, unknown_i5, unknown_i7, unknown_barcodes = \
-                cb.uniq_barc_no_spike(barcode_file_data, fastq_data,
-                                      parameters_dict["diff_barc"])
 
-            # Write data to output file
-            fw.uniq_no_spike_output(i5_i7_combinations, unknown_barcodes,
-                                    output_file)
+        # Write data to Excel output file
+        # TODO: Fix unique dual indexing writer
+        fw.no_spike_output(i5_i7_combinations, unknown_barcodes, output_file,
+                           i5_i7_loc, parameters_dict["indexing"])
 
     elif parameters_dict["indexing"] == "1":
         # combinatorial spike-ins i5+i7

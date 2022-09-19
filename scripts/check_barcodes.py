@@ -1,52 +1,7 @@
 from Levenshtein import distance
 
 
-def comb_barc_no_spike(fastq_data, barcode_file_data, diff_bar_nucl):
-    """
-    Checks if found barcode exists in the original barcodes file.
-    :param fastq_data: List with the structure [barcode 1, barcode2, etc].
-    :param barcode_file_data: List with all barcodes from the Excel file.
-    :param diff_bar_nucl: Parameter from parameters.txt.
-    :return unknown_barcodes: Dictionary with all fastq barcodes that have not
-            been found in the original barcode Excel file.
-            Structure: {barcode: occurrences}.
-    :return correct_barcodes: Dictionary with all barcodes from the original
-            barcode Excel file and the amount of times they have been found in the
-            fastq file. Structure: {barcode: occurrences}.
-    """
-    # TODO: Check if barcode i5+i7 are mismatched or if one of them contains
-    #  unknown barcode (like in def uniq_barc_no_spike)
-    # TODO: Add parameter to enable or disable the diff_bar_nucl param, speed
-    #  increases if distance function is not used
-    # TODO: Fix fastq_data variable. Used to be dict, now it is a list
-    # Creates an empty list
-    unknown_barcodes = {}
-    correct_barcodes = {}
-    for barcode in barcode_file_data:
-        correct_barcodes[barcode] = 0
-
-    # Loops through the found fastq barcodes
-    for fastq_barcode in fastq_data.keys():
-        counter = 0
-        # Loops through the list with original barcodes
-        for original_barcode in barcode_file_data:
-            # Checks if barcodes are similar to each other
-            if distance(fastq_barcode, original_barcode) <= int(diff_bar_nucl):
-                counter += 1
-                correct_barcodes[original_barcode] += 1
-        if counter == 0:
-            # Adds barcode and counter to dictionary if is has not been
-            # found
-            if fastq_barcode in unknown_barcodes.keys():
-                unknown_barcodes[fastq_barcode] += 1
-            else:
-                unknown_barcodes[fastq_barcode] = 1
-
-    # Returns the unknown_barcodes and correct_barcodes
-    return unknown_barcodes, correct_barcodes
-
-
-def uniq_barc_no_spike(barcode_file_data, fastq_data, diff_bar_nucl):
+def barc_no_spike(barcode_file_data, fastq_data, diff_bar_nucl):
     """
     Checks and counts the different possible i5 + i7 combinations.
     :param barcode_file_data: List with all barcodes from the Excel file.
@@ -63,8 +18,8 @@ def uniq_barc_no_spike(barcode_file_data, fastq_data, diff_bar_nucl):
     correct_i7_list = []
 
     # Splits the barcodes from the Excel file into i5 and i7
-    for barcode in barcode_file_data:
-        i5, i7 = barcode.split("+")
+    for line in barcode_file_data:
+        i5, i7 = line[1].split("+")
         correct_i5_list.append(i5)
         correct_i7_list.append(i7)
 
@@ -88,6 +43,7 @@ def uniq_barc_no_spike(barcode_file_data, fastq_data, diff_bar_nucl):
     # Checks if the barcode sequence is allowed to differ from the ones
     # in the barcode Excel file. If it is not allowed to differ:
     if diff_bar_nucl == "0":
+
         # Loops through the barcodes from the fastq file
         for barcode in fastq_data:
             i5, i7 = barcode.split("+")
@@ -107,6 +63,7 @@ def uniq_barc_no_spike(barcode_file_data, fastq_data, diff_bar_nucl):
             # If i5 + i7 both are unknown, it adds the barcode to a list
             else:
                 unknown_barcodes.append(barcode)
+
     # If barcode sequence is allowed to differ:
     else:
         # Loops through the barcodes from the fastq file
@@ -147,3 +104,17 @@ def uniq_barc_no_spike(barcode_file_data, fastq_data, diff_bar_nucl):
 
     # Returns i5_i7_combinations and unknown_barcodes to main function
     return i5_i7_combinations, unknown_i5, unknown_i7, unknown_barcodes
+
+
+def retrieve_barcode_location(barcode_file_data):
+    # TODO: Docstrings and comments
+    i5_i7_loc = {}
+    for barcode in barcode_file_data:
+        i5_loc = barcode[0][0]
+        i7_loc = barcode[0][1]
+        i5_bar, i7_bar = barcode[1].split("+")
+        if i5_bar not in i5_i7_loc:
+            i5_i7_loc[i5_bar] = [i5_loc, {i7_bar: i7_loc}]
+        else:
+            i5_i7_loc[i5_bar][1].update({i7_bar: i7_loc})
+    return i5_i7_loc

@@ -1,48 +1,7 @@
 import xlsxwriter
 
 
-def comb_no_spike_output(correct_barcodes, unknown_barcodes, output_file):
-    """
-    Creates the output Excel file for combinatorial indexing with no spike-in
-    sequence.
-    :param correct_barcodes: Dictionary with all barcodes from the original
-            barcode Excel file and the amount of times they have been found in
-            the fastq file. Structure: {barcode: occurrences}.
-    :param unknown_barcodes: Dictionary with all fastq barcodes that have not
-            been found in the original barcode Excel file.
-            Structure: {barcode: occurrences}.
-    :param output_file: Output file path.
-    :return: Excel output file at entered location.
-    """
-    # Creates a new Excel workbook
-    workbook = xlsxwriter.Workbook(output_file)
-    worksheet = workbook.add_worksheet()
-
-    # Makes the header bold
-    bold = workbook.add_format({'bold': True})
-    worksheet.write_row("A1", ["Correct barcodes:", "Occurrences:", "", "Unknown barcodes:", "Occurrences:"], bold)
-
-    # Writes the correct barcodes and number of occurrences to the Excel
-    # file
-    row = 0
-    for key in correct_barcodes.keys():
-        row += 1
-        worksheet.write(row, 0, key)
-        worksheet.write(row, 1, correct_barcodes[key])
-
-    # Writes the unknown barcodes and number of occurrences to the Excel
-    # file
-    row = 0
-    for key in unknown_barcodes.keys():
-        row += 1
-        worksheet.write(row, 3, key)
-        worksheet.write(row, 4, unknown_barcodes[key])
-
-    # Closes and saves the workbook
-    workbook.close()
-
-
-def uniq_no_spike_output(i5_i7_combinations, unknown_barcodes, output_file):
+def no_spike_output(i5_i7_combinations, unknown_barcodes, output_file, i5_i7_loc, indexing):
     """
     Creates the output Excel file for unique dual (non redundant) indexing with
     no spike-in sequence.
@@ -59,7 +18,7 @@ def uniq_no_spike_output(i5_i7_combinations, unknown_barcodes, output_file):
     # Heatmap: https://xlsxwriter.readthedocs.io/working_with_pandas.html
 
     # Create base layout in 2d list for Excel output file
-    excel_2d_list = [["", "", "i7 barcodes"], ["", ""]]
+    excel_2d_list = [["", "i7 barcodes"], ["", ""]]
 
     # Variable to add i7 barcodes to the array if they haven't been
     # added yet
@@ -68,18 +27,25 @@ def uniq_no_spike_output(i5_i7_combinations, unknown_barcodes, output_file):
     # Loops through all possible i5 + i7 combinations and adds the
     # occurrences to the Excel 2d array
     for i5 in i5_i7_combinations.keys():
-        row = ["", i5]
+        if indexing == "1":
+            row = [i5_i7_loc[i5][0], i5]
+        else:
+            row = ["", i5]
+
         for i7 in i5_i7_combinations[i5]:
             row.append(i5_i7_combinations[i5][i7])
             if add_i7:
                 excel_2d_list[1].append(i7)
+                if indexing == "1":
+                    excel_2d_list[0].append(int(i5_i7_loc[i5][1][i7]))
+
         # Calculates the row totals
         row.append(sum(row[2:]))
         excel_2d_list.append(row)
         add_i7 = False
 
     # Adds description to the i5 barcodes column
-    excel_2d_list[2][0] = "i5 barcodes"
+    excel_2d_list[1][0] = "i5 barcodes"
 
     # Adds Total description to the end of the row / column
     excel_2d_list[1].append("Total")
