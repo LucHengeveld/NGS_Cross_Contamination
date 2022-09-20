@@ -1,10 +1,11 @@
 # What is the .fastq or .bcl file path? Example: C:\Users\Biolegio\example.fastq
-fastq_testfiles\comb_example_no_spike.fastq
+fastq_testfiles\uniq_example_no_spike.fastq
 
 # What is the barcode (and spike-in sequence) file? Example: C:\Users\Biolegio\example.txt
-barcode_testfiles\comb_barcode_no_spike.xlsx
+barcode_testfiles\uniq_barcode_no_spike.xlsx
 
-1
+# Is the plate created by using combinatorial indexing (1) or unique dual indexing (2)?
+2
 
 # Would you like to analyse I5 + I7 (1) or spike-ins + I5 and I7 (2)?
 1
@@ -25,4 +26,4 @@ barcode_testfiles\comb_barcode_no_spike.xlsx
 output\
 
 # What name would you like to use for the output file?
-test
+uniq_no_spike
