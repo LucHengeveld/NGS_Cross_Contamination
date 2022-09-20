@@ -4,7 +4,7 @@ import xlsxwriter
 def no_spike_output(i5_i7_combinations, unknown_barcodes, unknown_i5,
                     unknown_i7, output_file, i5_i7_loc, indexing):
     """
-    Creates the output Excel file for unique dual (non redundant) indexing with
+    Creates the output Excel file for unique dual (non-redundant) indexing with
     no spike-in sequence.
     :param i5_i7_combinations: Dictionary containing all possible i5 + i7
             combinations and its amount of occurrences in the fastq file.
@@ -93,6 +93,14 @@ def no_spike_output(i5_i7_combinations, unknown_barcodes, unknown_i5,
                 elif i == j and 1 < i < len(excel_2d_list) - 1:
                     contamination_table.write(i, j, excel_2d_list[i][j],
                                               green_bg)
+                elif i != len(excel_2d_list) - 1 and j != \
+                        len(excel_2d_list[i]) - 1:
+                    if indexing == "1":
+                        contamination_table.write(i, j, excel_2d_list[i][j])
+                    else:
+                        contamination_table.write(i, j, excel_2d_list[i][j],
+                                                  heatmap(excel_2d_list, i, j,
+                                                          workbook))
                 else:
                     contamination_table.write(i, j, excel_2d_list[i][j])
 
@@ -102,6 +110,7 @@ def no_spike_output(i5_i7_combinations, unknown_barcodes, unknown_i5,
         unknown_i5_i7_sheet.set_column("B:B", 11.7)
         unknown_i5_i7_sheet.write_row(0, 0, ["Unknown i5 + i7 barcodes:",
                                              "Occurrences:"], bold)
+
         for row in range(len(unknown_barcodes.keys())):
             unknown_i5_i7_sheet.write_row(row + 1, 0,
                                           [list(unknown_barcodes.keys())[row],
@@ -131,3 +140,48 @@ def no_spike_output(i5_i7_combinations, unknown_barcodes, unknown_i5,
                                        [list(unknown_i7.keys())[row],
                                         unknown_i7[list(unknown_i7.keys()
                                                         )[row]]])
+
+
+def heatmap(excel_2d_list, i, j, workbook):
+    """
+    Returns the cell background color format.
+    :param excel_2d_list: 2D list of the Excel output data.
+    :param i: y-coordinate of current cell in excel_2d_list.
+    :param j: x-coordinate of current cell in excel_2d_list.
+    :param workbook: Excel workbook object to save the background color.
+    :return bg_format: Background color format for a specific cell.
+    """
+    # Checks if cell values should be compared to the correct barcode
+    # value in its row or column
+    if i < j:
+        max_val = round(excel_2d_list[i][i] / 10000)
+    else:
+        max_val = round(excel_2d_list[j][j] / 10000)
+
+    # If the correct barcode has value 0 and current cell has value 0,
+    # return white background color
+    if max_val == 0 and excel_2d_list[i][j] == 0:
+        hex_color = '#%02x%02x%02x' % (255, 255, 255)
+
+    # If the correct barcode has value 0 and current cell has a higher
+    # value or current cell value is higher than correct barcode value,
+    # return red background color
+    elif max_val == 0 or excel_2d_list[i][j] > max_val:
+        hex_color = '#%02x%02x%02x' % (255, 0, 0)
+
+    # If the correct barcode has a value higher than 0 and current cell
+    # has value 0, return white background color
+    elif excel_2d_list[i][j] == 0:
+        hex_color = '#%02x%02x%02x' % (255, 255, 255)
+
+    # Calculates the shade of red for the cell if it does not get
+    # through the if statements above
+    else:
+        current_cell = excel_2d_list[i][j]
+        color = round(255 - (255 * current_cell / max_val))
+        hex_color = '#%02x%02x%02x' % (255, color, color)
+
+    # Saves the color to the workbook background color format and
+    # returns it
+    bg_format = workbook.add_format({'bg_color': hex_color})
+    return bg_format
