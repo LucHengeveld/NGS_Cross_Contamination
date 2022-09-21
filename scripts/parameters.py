@@ -12,7 +12,7 @@ def retrieve_parameters(parameters_file):
 
     keys_list = ["fastq_file_path", "barcode_file_path", "indexing",
                  "spike_ins", "diff_barc", "diff_seq", "sequencer",
-                 "output_dir", "output_filename"]
+                 "output_dir", "output_filename", "heatmap_percentage"]
 
     counter = 0
     # Opens the parameters file and saves the parameters to a list
@@ -86,14 +86,19 @@ def check_parameters(parameters_dict):
         exit(8)
 
     # Checks if all parameters have been entered
-    # TODO: Update 9 if more params are added
-    if len(parameters_dict.keys()) < 9:
+    # TODO: Update 10 if more params are added
+    if len(parameters_dict.keys()) < 10:
         print("Error 9: Missing one of the parameters. Make sure you have "
               "entered all parameters in parameters.txt")
         exit(9)
 
     # TODO: Param heatmap % (bv 0,01% / 0,1% / 0,5% / etc)
-    
+    try:
+        parameters_dict["heatmap_percentage"] = float(
+            parameters_dict["heatmap_percentage"])
+    except ValueError:
+        print("Error 16: Entered heatmap contamination percentage is not a number.")
+
     # If all parameters are entered correctly, return the file extension
     # and continue with the script
     return file_extension

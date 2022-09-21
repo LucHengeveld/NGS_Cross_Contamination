@@ -49,12 +49,14 @@ if __name__ == "__main__":
             # Write data to Excel output file
             fw.no_spike_output(i5_i7_combinations, unknown_barcodes,
                                unknown_i5, unknown_i7, output_file, i5_i7_loc,
-                               parameters_dict["indexing"])
+                               parameters_dict["indexing"],
+                               parameters_dict["heatmap_percentage"])
         else:
             # Write data to Excel output file
             fw.no_spike_output(i5_i7_combinations, unknown_barcodes,
                                unknown_i5, unknown_i7, output_file, [],
-                               parameters_dict["indexing"])
+                               parameters_dict["indexing"],
+                               parameters_dict["heatmap_percentage"])
 
     elif parameters_dict["indexing"] == "1":
         # combinatorial spike-ins i5+i7

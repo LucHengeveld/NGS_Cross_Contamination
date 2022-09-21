@@ -2,7 +2,7 @@ import xlsxwriter
 
 
 def no_spike_output(i5_i7_combinations, unknown_barcodes, unknown_i5,
-                    unknown_i7, output_file, i5_i7_loc, indexing):
+                    unknown_i7, output_file, i5_i7_loc, indexing, heatmap_percentage):
     """
     Creates the output Excel file for unique dual (non-redundant) indexing with
     no spike-in sequence.
@@ -20,6 +20,7 @@ def no_spike_output(i5_i7_combinations, unknown_barcodes, unknown_i5,
             corresponding well locations. Dictionary has the structure:
             {i5: ["A" {i7: 1, i7: 2}]}.
     :param indexing: Parameter of the used indexing method.
+    :param heatmap_percentage: Parameter of the maximum allowed contamination.
     :return: Excel output file at entered location.
     """
     # TODO: Possible improvement: Add heatmap.
@@ -27,7 +28,7 @@ def no_spike_output(i5_i7_combinations, unknown_barcodes, unknown_i5,
     # TODO: Split this function into multiple ones.
 
     # Create base layout in 2d list for Excel output file
-    excel_2d_list = [["", "i7 barcodes"], ["", ""]]
+    excel_2d_list = [["", "i7 barcodes →"], ["", ""]]
 
     # Variable to add i7 barcodes to the array if they haven't been
     # added yet
@@ -54,7 +55,7 @@ def no_spike_output(i5_i7_combinations, unknown_barcodes, unknown_i5,
         add_i7 = False
 
     # Adds description to the i5 barcodes column
-    excel_2d_list[1][0] = "i5 barcodes"
+    excel_2d_list[1][0] = "i5 barcodes ↓"
 
     # Adds Total description to the end of the row / column
     excel_2d_list[1].append("Total")
@@ -77,12 +78,15 @@ def no_spike_output(i5_i7_combinations, unknown_barcodes, unknown_i5,
         bold = workbook.add_format({'bold': True})
         green_bg = workbook.add_format({'bg_color': '#adebad'})
 
-        # Saves the amount of columns to a variable
+        # Saves the amount of columns and rows to a variable
         cols = len(excel_2d_list[1])
+        rows = len(excel_2d_list)
 
         # Set column width
-        contamination_table.set_column(0, 1, 10.3)
-        contamination_table.set_column(2, cols, 9.3)
+        contamination_table.set_column(0, cols, 11)
+
+        border_format = workbook.add_format({'border': 1})
+        contamination_table.conditional_format(1, 1, rows, cols, {'type': 'no_blanks', 'format': border_format})
 
         # Loops through the data and writes it to an Excel sheet with
         # the correct cell format (bold / green background)
@@ -100,7 +104,8 @@ def no_spike_output(i5_i7_combinations, unknown_barcodes, unknown_i5,
                     else:
                         contamination_table.write(i, j, excel_2d_list[i][j],
                                                   heatmap(excel_2d_list, i, j,
-                                                          workbook))
+                                                          workbook,
+                                                          heatmap_percentage))
                 else:
                     contamination_table.write(i, j, excel_2d_list[i][j])
 
@@ -142,21 +147,22 @@ def no_spike_output(i5_i7_combinations, unknown_barcodes, unknown_i5,
                                                         )[row]]])
 
 
-def heatmap(excel_2d_list, i, j, workbook):
+def heatmap(excel_2d_list, i, j, workbook, heatmap_percentage):
     """
     Returns the cell background color format.
     :param excel_2d_list: 2D list of the Excel output data.
     :param i: y-coordinate of current cell in excel_2d_list.
     :param j: x-coordinate of current cell in excel_2d_list.
     :param workbook: Excel workbook object to save the background color.
+    :param heatmap_percentage: Parameter of the maximum allowed contamination.
     :return bg_format: Background color format for a specific cell.
     """
     # Checks if cell values should be compared to the correct barcode
     # value in its row or column
     if i < j:
-        max_val = round(excel_2d_list[i][i] / 10000)
+        max_val = round(excel_2d_list[i][i] * (heatmap_percentage / 100))
     else:
-        max_val = round(excel_2d_list[j][j] / 10000)
+        max_val = round(excel_2d_list[j][j] * (heatmap_percentage / 100))
 
     # If the correct barcode has value 0 and current cell has value 0,
     # return white background color

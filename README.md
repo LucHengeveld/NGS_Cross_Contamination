@@ -16,3 +16,4 @@
 13) file_readers.py: Error 13: Entered barcode file has not been found. Please make sure the path to the file is correct.
 14) file_readers.py: Error 14: Barcode file format incorrect. Please enter a correct barcode file.
 15) file_readers.py: Error 15: Barcode file format incorrect. Please enter a correct barcode file.
+16) parameters.py: Error 16: Entered heatmap contamination percentage is not a number.

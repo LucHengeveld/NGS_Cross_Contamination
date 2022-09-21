@@ -28,4 +28,7 @@ output\
 # What name would you like to use for the output file?
 uniq_no_spike
 
-# TODO: Parameter for % heatmap (bv 0,01%, 0,1% 0,5% etc)
+# What is the maximum percentage of contamination compared to the amount of correct reads? Please use the following format:
+# Write '1' for 1% max contamination
+# Write '0.1' (seperated by a dot) for 0.1% max contamination
+0.05
