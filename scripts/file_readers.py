@@ -17,14 +17,23 @@ def fastq_reader_no_spike(fastq_path):
     # Creates an empty dictionary
     fastq_data = []
 
-    # Opens the .fastq and reads it line by line
-    with open(fastq_path, "r") as fastq_file:
-        for line in fastq_file:
-            # If line starts with a @ it retrieves the barcode
-            if line.startswith("@"):
-                fastq_data.append(line.split(":")[-1].replace("\n", ""))
-    # Returns the fastq dictionary
-    return fastq_data
+    try:
+        # Opens the .fastq and reads it line by line
+        with open(fastq_path, "r") as fastq_file:
+            for line in fastq_file:
+                # If line starts with a @ it retrieves the barcode
+                if line.startswith("@"):
+                    fastq_data.append(line.split(":")[-1].replace("\n", ""))
+        if len(fastq_data) == 0:
+            print("Error 10: Fasta file format is incorrect. No headers"
+                  "found.")
+            exit(10)
+        # Returns the fastq dictionary
+        return fastq_data
+    except FileNotFoundError:
+        print("Error 11: Entered fastq file has not been found. Please make"
+              "sure the path to the file is correct.")
+        exit(11)
 
 
 def barcode_file_reader(barcode_file, sequencing_method, spike_ins):
@@ -38,10 +47,14 @@ def barcode_file_reader(barcode_file, sequencing_method, spike_ins):
     :return barcode_file_dict: Dictionary with structure {barcode:well, [spike
             seq1, spike seq2, etc]}.
     """
-    # Loads in the Excel barcode file
-    excel_reader = openpyxl.load_workbook(barcode_file)
-    sheet = excel_reader.active
-
+    try:
+        # Loads in the Excel barcode file
+        excel_reader = openpyxl.load_workbook(barcode_file)
+        sheet = excel_reader.active
+    except FileNotFoundError:
+        print("Error 13: Entered barcode file has not been found. Please make"
+              "sure the path to the file is correct.")
+        exit(13)
     # Creates an empty list and dictionary
     barcode_file_list = []
     barcode_file_dict = {}
@@ -51,23 +64,31 @@ def barcode_file_reader(barcode_file, sequencing_method, spike_ins):
         i5 = 8
     else:
         i5 = 9
+    try:
+        # Checks spike in parameter
+        if spike_ins == "1":
+            # Retrieve barcodes from the Excel file
+            for row in sheet.iter_rows(min_row=4, values_only=True):
+                barcode_file_list.append([row[0], row[i5] + "+" + row[4]])
+            # Returns the barcode_file_list
+            return barcode_file_list
 
-    # Checks spike in parameter
-    if spike_ins == "1":
-        # Retrieve barcodes from the Excel file
-        for row in sheet.iter_rows(min_row=4, values_only=True):
-            barcode_file_list.append([row[0], row[i5] + "+" + row[4]])
-        # Returns the barcode_file_list
-        return barcode_file_list
+        else:
+            # Retrieve barcodes and spike-in sequences from the Excel file
+            for row in sheet.iter_rows(min_row=4, values_only=True):
+                barcode = row[i5] + "+" + row[4]
+                if barcode in barcode_file_dict.keys():
+                    barcode_file_dict[barcode][1].append(row[-1])
+                else:
+                    barcode_file_dict[barcode] = [row[0], [row[-1]]]
 
-    else:
-        # Retrieve barcodes and spike-in sequences from the Excel file
-        for row in sheet.iter_rows(min_row=4, values_only=True):
-            barcode = row[i5] + "+" + row[4]
-            if barcode in barcode_file_dict.keys():
-                barcode_file_dict[barcode][1].append(row[-1])
-            else:
-                barcode_file_dict[barcode] = [row[0], [row[-1]]]
-
-        # Returns the barcode_file_dict
-        return barcode_file_dict
+            # Returns the barcode_file_dict
+            return barcode_file_dict
+    except IndexError:
+        print("Error 14: Barcode file format incorrect. Please enter a correct"
+              "barcode file.")
+        exit(14)
+    except TypeError:
+        print("Error 15: Barcode file format incorrect. Please enter a correct"
+              "barcode file.")
+        exit(15)

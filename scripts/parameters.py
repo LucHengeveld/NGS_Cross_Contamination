@@ -33,7 +33,7 @@ def check_parameters(parameters_dict):
     if not parameters_dict["fastq_file_path"].split(".")[1] in ["bcl",
                                                                 "fastq"]:
         print("Error 1: Entered file has incorrect extension. Please enter a "
-              ".bcl or .fastq file path in parameters.txt")
+              ".bcl or .fastq file path in parameters.txt.")
         exit(1)
     else:
         # If file has correct extension, it saves it to a variable
@@ -67,32 +67,33 @@ def check_parameters(parameters_dict):
 
     # Checks if max different nucleotides of sequences is numeric
     if not parameters_dict["diff_seq"].isdecimal():
-        print(
-            "Error 6: Entered maximum nucleotide difference between sequences"
-            " is not numeric. Please enter a number.")
+        print("Error 6: Entered maximum nucleotide difference between"
+              "sequences is not numeric. Please enter a number.")
         exit(6)
 
     # Checks if entered sequencer value is correct
     if parameters_dict["sequencer"] not in ["1", "2"]:
-        print("Error 6: Entered sequencer value is incorrect. Please enter a"
+        print("Error 7: Entered sequencer value is incorrect. Please enter a"
               "'1' if iSeq, MiniSeq, NextSeq, HiSeq3000 or HiSeq4000 has been "
               "used. Enter a '2' if a MiSeq, HiSeq2000-2500 or Novaseq has "
               "been used.")
-        exit(6)
+        exit(7)
 
     # Checks if entered output directory exists
     if not os.path.isdir(parameters_dict["output_dir"]):
-        print("Error 7: Entered output directory path does not exist. Please "
+        print("Error 8: Entered output directory path does not exist. Please "
               "enter a correct output directory path.")
-        exit(7)
+        exit(8)
 
     # Checks if all parameters have been entered
     # TODO: Update 9 if more params are added
     if len(parameters_dict.keys()) < 9:
-        print("Error 8: Missing one of the parameters. Make sure you have "
+        print("Error 9: Missing one of the parameters. Make sure you have "
               "entered all parameters in parameters.txt")
-        exit(8)
+        exit(9)
 
+    # TODO: Param heatmap % (bv 0,01% / 0,1% / 0,5% / etc)
+    
     # If all parameters are entered correctly, return the file extension
     # and continue with the script
     return file_extension
