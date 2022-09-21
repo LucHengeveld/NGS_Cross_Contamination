@@ -1,5 +1,5 @@
 # What is the .fastq or .bcl file path? Example: C:\Users\Biolegio\example.fastq
-fastq_testfiles\uniq_example_no_spike.fastq
+fastq_testfiles\uniq_fastq_no_spike.fastq
 
 # What is the barcode (and spike-in sequence) file? Example: C:\Users\Biolegio\example.txt
 barcode_testfiles\uniq_barcode_no_spike.xlsx
@@ -27,3 +27,5 @@ output\
 
 # What name would you like to use for the output file?
 uniq_no_spike
+
+# TODO: Parameter for % heatmap (bv 0,01%, 0,1% 0,5% etc)
