@@ -17,6 +17,8 @@ def barc_no_spike(barcode_file_data, fastq_data, diff_bar_nucl):
     :return unknown_i7: Dictionary with all unknown i7 barcodes from the fastq
             file.
     """
+    # TODO: Split function into smaller ones
+    # TODO: Filter out unknown barcodes that contain homopolymers (AAAA etc)
     # Creates empty lists
     correct_i5_list = []
     correct_i7_list = []

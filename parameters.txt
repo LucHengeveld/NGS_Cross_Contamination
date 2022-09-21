@@ -1,8 +1,9 @@
 # What is the .fastq or .bcl file path? Example: C:\Users\Biolegio\example.fastq
-fastq_testfiles\uniq_fastq_no_spike.fastq
+# fastq_testfiles\uniq_fastq_no_spike.fastq
+fastq_testfiles\bigfile.fastq
 
 # What is the barcode (and spike-in sequence) file? Example: C:\Users\Biolegio\example.txt
-barcode_testfiles\uniq_barcode_no_spike.xlsx
+barcode_testfiles\uniq_barcode_no_spike_test.xlsx
 
 # Is the plate created by using combinatorial indexing (1) or unique dual indexing (2)?
 2
@@ -11,7 +12,7 @@ barcode_testfiles\uniq_barcode_no_spike.xlsx
 1
 
 # How many nucleotides are the found barcodes allowed to differ from the original barcodes?
-0
+1
 
 # How many nucleotides are the found spike-in sequences allowed to differ from
 # the original sequences? Enter a 0 if you are not using spike-in sequences
@@ -26,9 +27,9 @@ barcode_testfiles\uniq_barcode_no_spike.xlsx
 output\
 
 # What name would you like to use for the output file?
-uniq_no_spike
+bigfile
 
 # What is the maximum percentage of contamination compared to the amount of correct reads? Please use the following format:
 # Write '1' for 1% max contamination
 # Write '0.1' (seperated by a dot) for 0.1% max contamination
-0.05
+0.01
