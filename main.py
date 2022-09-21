@@ -5,8 +5,6 @@ from scripts import file_readers as fr, parameters as pm, \
 
 if __name__ == "__main__":
     # TODO: Docstrings / comments.
-    # TODO: Error: File doesn't exist
-    # TODO: Error: try except around file reader
     # Main function of the script, calls the different functions
     # Saves the user entered parameters in a list
     parameters_dict = pm.retrieve_parameters("parameters.txt")
