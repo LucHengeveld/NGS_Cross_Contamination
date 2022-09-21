@@ -92,7 +92,7 @@ def check_parameters(parameters_dict):
               "entered all parameters in parameters.txt")
         exit(9)
 
-    # TODO: Param heatmap % (bv 0,01% / 0,1% / 0,5% / etc)
+    # Checks if entered heatmap contamination percentage is a number
     try:
         parameters_dict["heatmap_percentage"] = float(
             parameters_dict["heatmap_percentage"])

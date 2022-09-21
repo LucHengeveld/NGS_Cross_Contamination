@@ -23,8 +23,6 @@ def no_spike_output(i5_i7_combinations, unknown_barcodes, unknown_i5,
     :param heatmap_percentage: Parameter of the maximum allowed contamination.
     :return: Excel output file at entered location.
     """
-    # TODO: Possible improvement: Add heatmap.
-    # Heatmap: https://xlsxwriter.readthedocs.io/working_with_pandas.html
     # TODO: Split this function into multiple ones.
 
     # Create base layout in 2d list for Excel output file
@@ -85,6 +83,7 @@ def no_spike_output(i5_i7_combinations, unknown_barcodes, unknown_i5,
         # Set column width
         contamination_table.set_column(0, cols, 11)
 
+        # Adds borders around the data
         border_format = workbook.add_format({'border': 1})
         contamination_table.conditional_format(1, 1, rows, cols, {'type': 'no_blanks', 'format': border_format})
 
@@ -158,21 +157,22 @@ def heatmap(excel_2d_list, i, j, workbook, heatmap_percentage):
     :return bg_format: Background color format for a specific cell.
     """
     # Checks if cell values should be compared to the correct barcode
-    # value in its row or column
+    # value in its row or column and calculates the max amount of
+    # contaminated reads
     if i < j:
-        max_val = round(excel_2d_list[i][i] * (heatmap_percentage / 100))
+        max_con = round(excel_2d_list[i][i] * (heatmap_percentage / 100))
     else:
-        max_val = round(excel_2d_list[j][j] * (heatmap_percentage / 100))
+        max_con = round(excel_2d_list[j][j] * (heatmap_percentage / 100))
 
     # If the correct barcode has value 0 and current cell has value 0,
     # return white background color
-    if max_val == 0 and excel_2d_list[i][j] == 0:
+    if max_con == 0 and excel_2d_list[i][j] == 0:
         hex_color = '#%02x%02x%02x' % (255, 255, 255)
 
     # If the correct barcode has value 0 and current cell has a higher
     # value or current cell value is higher than correct barcode value,
     # return red background color
-    elif max_val == 0 or excel_2d_list[i][j] > max_val:
+    elif max_con == 0 or excel_2d_list[i][j] > max_con:
         hex_color = '#%02x%02x%02x' % (255, 0, 0)
 
     # If the correct barcode has a value higher than 0 and current cell
@@ -184,7 +184,7 @@ def heatmap(excel_2d_list, i, j, workbook, heatmap_percentage):
     # through the if statements above
     else:
         current_cell = excel_2d_list[i][j]
-        color = round(255 - (255 * current_cell / max_val))
+        color = round(255 - (255 * current_cell / max_con))
         hex_color = '#%02x%02x%02x' % (255, color, color)
 
     # Saves the color to the workbook background color format and
