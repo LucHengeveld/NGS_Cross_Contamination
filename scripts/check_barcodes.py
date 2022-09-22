@@ -1,4 +1,5 @@
 from Levenshtein import distance
+import re
 
 
 def barc_no_spike(barcode_file_data, fastq_data, diff_bar_nucl):
@@ -148,8 +149,8 @@ def retrieve_barcode_location(barcode_file_data):
 
     # Loops through the barcodes from the entered barcode Excel file
     for barcode in barcode_file_data:
-        i5_loc = barcode[0][0]
-        i7_loc = barcode[0][1]
+        i5_loc = re.split('(\d+)', barcode[0])[0]
+        i7_loc = re.split('(\d+)', barcode[0])[1]
         i5_bar, i7_bar = barcode[1].split("+")
 
         # Adds the barcodes and their well locations to the dictionary

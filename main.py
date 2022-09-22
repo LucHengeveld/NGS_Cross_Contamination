@@ -10,6 +10,7 @@ if __name__ == "__main__":
     # TODO: Docstrings / comments.
     # Main function of the script, calls the different functions
     # Saves the user entered parameters in a list
+    print("Retrieve parameters", time.strftime("%H:%M"))
     parameters_dict = pm.retrieve_parameters("parameters.txt")
 
     # Checks if the parameters have been entered correctly by the user
@@ -23,38 +24,39 @@ if __name__ == "__main__":
     # else:
     #     fastq_dict = fr.fastq_reader(parameters_dict["fastq_file_path"])
 
-    print(1)
+    print("Retrieve barcodes from barcode file", time.strftime("%H:%M"))
     # Retrieves the data from the barcode Excel file
     barcode_file_data = fr.barcode_file_reader(
         parameters_dict["barcode_file_path"],
         parameters_dict["sequencer"],
         parameters_dict["spike_ins"])
 
-    print(2)
     # Combinatorial and unique dual indexing without spike-in sequence
     if parameters_dict["spike_ins"] == "1":
 
-        print(3)
+        print("Retrieve barcodes from fastq file", time.strftime("%H:%M"))
         # Retrieve barcodes from fastq file
         fastq_data = fr.fastq_reader_no_spike(
             parameters_dict["fastq_file_path"])
 
-        print(4)
+        print("Compare barcodes", time.strftime("%H:%M"))
         # Compare all fastq barcode sequences to the ones from the
         # input Excel file
         i5_i7_combinations, unknown_barcodes, unknown_i5, unknown_i7 = \
             cb.barc_no_spike(barcode_file_data, fastq_data,
                              parameters_dict["diff_barc"])
 
-        print(5)
+        print("Retrieve output filename and location", time.strftime("%H:%M"))
         # Saves the output file location and name to a variable
         output_file = parameters_dict["output_dir"] + parameters_dict[
             "output_filename"] + ".xlsx"
 
         if parameters_dict["indexing"] == "1":
             # Retrieve barcode well locations
+            print("Retrieve well locations", time.strftime("%H:%M"))
             i5_i7_loc = cb.retrieve_barcode_location(barcode_file_data)
 
+            print("Write comb data to excel output file", time.strftime("%H:%M"))
             # Write data to Excel output file
             fw.no_spike_output(i5_i7_combinations, unknown_barcodes,
                                unknown_i5, unknown_i7, output_file, i5_i7_loc,
@@ -62,7 +64,7 @@ if __name__ == "__main__":
                                parameters_dict["heatmap_percentage"])
         else:
 
-            print(6)
+            print("Write uniq data to excel output file", time.strftime("%H:%M"))
             # Write data to Excel output file
             fw.no_spike_output(i5_i7_combinations, unknown_barcodes,
                                unknown_i5, unknown_i7, output_file, [],

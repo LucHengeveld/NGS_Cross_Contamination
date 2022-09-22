@@ -94,8 +94,11 @@ def no_spike_output(i5_i7_combinations, unknown_barcodes, unknown_i5,
                 if i in [0, 1] or j in [0, 1]:
                     contamination_table.write(i, j, excel_2d_list[i][j], bold)
                 elif i == j and 1 < i < len(excel_2d_list) - 1:
-                    contamination_table.write(i, j, excel_2d_list[i][j],
-                                              green_bg)
+                    if indexing == "1":
+                        contamination_table.write(i, j, excel_2d_list[i][j])
+                    else:
+                        contamination_table.write(i, j, excel_2d_list[i][j],
+                                                  green_bg)
                 elif i != len(excel_2d_list) - 1 and j != \
                         len(excel_2d_list[i]) - 1:
                     if indexing == "1":
