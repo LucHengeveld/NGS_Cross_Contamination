@@ -21,3 +21,4 @@
 17) parameters.py: Error 17:  Entered spike-ins trimming value is not numeric.
 18) parameters.py: Error 18: Entered spike-ins i5 trimming value is not numeric.
 19) parameters.py: Error 19: Entered spike-ins i7 trimming value is not numeric.
+20) Parameters.py: Error 20: Entered spike-ins order value is not numeric.

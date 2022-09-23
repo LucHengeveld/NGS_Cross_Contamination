@@ -50,3 +50,8 @@ comb_spike
 
 # If using spike-ins: how many nucleotides should be trimmed from the i7 end?
 0
+
+# If using spike ins: In which order would you like for the program to count the sequences?
+# (1) Per column: A1=1, B1=2, C1=3, ..., A2=9, B2=10, C2=11, ...
+# (2) Per row: A1=1, A2=2, A3=3, ..., B1=13, B2=14, B2=15, ...
+1

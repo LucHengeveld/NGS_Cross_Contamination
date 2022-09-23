@@ -13,7 +13,7 @@ def retrieve_parameters(parameters_file):
     keys_list = ["fastq_file_path", "barcode_file_path", "indexing",
                  "spike_ins", "diff_barc", "diff_seq", "sequencer",
                  "output_dir", "output_filename", "heatmap_percentage",
-                 "trimming_ends", "trim_i5", "trim_i7"]
+                 "trimming_ends", "trim_i5", "trim_i7", "spike_order"]
 
     counter = 0
     # Opens the parameters file and saves the parameters to a list
@@ -77,8 +77,8 @@ def check_parameters(parameters_dict):
         exit(8)
 
     # Checks if all parameters have been entered
-    # TODO: Update 11 if more params are added
-    if len(parameters_dict.keys()) < 11:
+    # TODO: Update 14 if more params are added
+    if len(parameters_dict.keys()) < 14:
         print("Error 9: Missing one of the parameters. Make sure you have "
               "entered all parameters in parameters.txt")
         exit(9)
@@ -102,6 +102,11 @@ def check_parameters(parameters_dict):
     if not parameters_dict["trim_i7"].isdecimal():
         print("Error 19: Entered spike-ins i7 trimming value is not numeric.")
         exit(19)
+
+    if not parameters_dict["spike_order"].isdecimal():
+        print("Error 20: Entered spike-ins order value is not numeric.")
+        exit(20)
+
     # If all parameters are entered correctly, return the file extension
     # and continue with the script
     return file_extension
