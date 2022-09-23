@@ -31,8 +31,7 @@ def fastq_reader_no_spike(fastq_path):
         # Returns the fastq dictionary
         return fastq_data
     except FileNotFoundError:
-        print("Error 11: Entered fastq file has not been found. Please make"
-              "sure the path to the file is correct.")
+        print("Error 11: Entered fastq file has not been found.")
         exit(11)
 
 
@@ -52,8 +51,7 @@ def barcode_file_reader(barcode_file, sequencing_method, spike_ins):
         excel_reader = openpyxl.load_workbook(barcode_file)
         sheet = excel_reader.active
     except FileNotFoundError:
-        print("Error 13: Entered barcode file has not been found. Please make"
-              "sure the path to the file is correct.")
+        print("Error 13: Entered barcode file has not been found.")
         exit(13)
     # Creates an empty list and dictionary
     barcode_file_list = []
@@ -85,10 +83,8 @@ def barcode_file_reader(barcode_file, sequencing_method, spike_ins):
             # Returns the barcode_file_dict
             return barcode_file_dict
     except IndexError:
-        print("Error 14: Barcode file format incorrect. Please enter a correct"
-              "barcode file.")
+        print("Error 14: Barcode file format incorrect.")
         exit(14)
     except TypeError:
-        print("Error 15: Barcode file format incorrect. Please enter a correct"
-              "barcode file.")
+        print("Error 15: Barcode file format incorrect.")
         exit(15)
