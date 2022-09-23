@@ -12,7 +12,8 @@ def retrieve_parameters(parameters_file):
 
     keys_list = ["fastq_file_path", "barcode_file_path", "indexing",
                  "spike_ins", "diff_barc", "diff_seq", "sequencer",
-                 "output_dir", "output_filename", "heatmap_percentage"]
+                 "output_dir", "output_filename", "heatmap_percentage",
+                 "trimming_ends", "trim_i5", "trim_i7"]
 
     counter = 0
     # Opens the parameters file and saves the parameters to a list
@@ -32,8 +33,7 @@ def check_parameters(parameters_dict):
     # Checks if the entered fastq/bcl file has the correct extension
     if not parameters_dict["fastq_file_path"].split(".")[1] in ["bcl",
                                                                 "fastq"]:
-        print("Error 1: Entered file has incorrect extension. Please enter a "
-              ".bcl or .fastq file path in parameters.txt.")
+        print("Error 1: Entered fastq / bcl file has incorrect extension.")
         exit(1)
     else:
         # If file has correct extension, it saves it to a variable
@@ -41,53 +41,44 @@ def check_parameters(parameters_dict):
 
     # Checks if the entered xlsx file has the correct extension
     if parameters_dict["barcode_file_path"].split(".")[1] != "xlsx":
-        print("Error 2: Entered file has incorrect extension. Please enter a "
-              ".xlsx file path in parameters.txt")
+        print("Error 2: Entered barcode file has incorrect extension.")
         exit(2)
 
     # Checks if the entered indexing value is correct
     if parameters_dict["indexing"] not in ["1", "2"]:
-        print("Error 3: Entered indexing value is incorrect. Please enter a "
-              "'1' if combinatorial indexing has been used or a '2' if unique"
-              "dual indexing / non redundant indexing has been used.")
+        print("Error 3: Entered indexing value is incorrect.")
         exit(3)
 
     # Checks if entered analysis value is correct
-    if parameters_dict["spike_ins"] not in ["1", "2"]:
-        print("Error 4: Entered analysis value is incorrect. Please enter a "
-              "'1' to analyse I5 + I7 or a '2' to analyse spike-ins + I5 and "
-              "I7.")
+    if parameters_dict["spike_ins"] not in ["1", "2", "3", "4"]:
+        print("Error 4: Entered analysis value is incorrect.")
         exit(4)
 
     # Checks if max different nucleotides of barcodes is numeric
     if not parameters_dict["diff_barc"].isdecimal():
         print("Error 5: Entered maximum nucleotide difference between barcodes"
-              " is not numeric. Please enter a number.")
+              " is not numeric.")
         exit(5)
 
     # Checks if max different nucleotides of sequences is numeric
     if not parameters_dict["diff_seq"].isdecimal():
         print("Error 6: Entered maximum nucleotide difference between"
-              "sequences is not numeric. Please enter a number.")
+              "sequences is not numeric.")
         exit(6)
 
     # Checks if entered sequencer value is correct
     if parameters_dict["sequencer"] not in ["1", "2"]:
-        print("Error 7: Entered sequencer value is incorrect. Please enter a"
-              "'1' if iSeq, MiniSeq, NextSeq, HiSeq3000 or HiSeq4000 has been "
-              "used. Enter a '2' if a MiSeq, HiSeq2000-2500 or Novaseq has "
-              "been used.")
+        print("Error 7: Entered sequencer value is incorrect.")
         exit(7)
 
     # Checks if entered output directory exists
     if not os.path.isdir(parameters_dict["output_dir"]):
-        print("Error 8: Entered output directory path does not exist. Please "
-              "enter a correct output directory path.")
+        print("Error 8: Entered output directory path does not exist.")
         exit(8)
 
     # Checks if all parameters have been entered
-    # TODO: Update 10 if more params are added
-    if len(parameters_dict.keys()) < 10:
+    # TODO: Update 11 if more params are added
+    if len(parameters_dict.keys()) < 11:
         print("Error 9: Missing one of the parameters. Make sure you have "
               "entered all parameters in parameters.txt")
         exit(9)
@@ -99,6 +90,18 @@ def check_parameters(parameters_dict):
     except ValueError:
         print("Error 16: Entered heatmap contamination percentage is not a number.")
 
+    # Checks if max different nucleotides of sequences is numeric
+    if not parameters_dict["trimming_ends"].isdecimal():
+        print("Error 17: Entered spike-ins trimming value is not numeric.")
+        exit(17)
+
+    if not parameters_dict["trim_i5"].isdecimal():
+        print("Error 18: Entered spike-ins i5 trimming value is not numeric.")
+        exit(18)
+
+    if not parameters_dict["trim_i7"].isdecimal():
+        print("Error 19: Entered spike-ins i7 trimming value is not numeric.")
+        exit(19)
     # If all parameters are entered correctly, return the file extension
     # and continue with the script
     return file_extension
