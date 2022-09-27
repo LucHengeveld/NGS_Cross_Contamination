@@ -11,7 +11,7 @@ def retrieve_parameters(parameters_file):
     parameters_dict = {}
 
     keys_list = ["fastq_file_path", "barcode_file_path", "indexing",
-                 "spike_ins", "diff_barc", "diff_seq", "sequencer",
+                 "spike_ins", "diff_barc", "diff_spike", "sequencer",
                  "output_dir", "output_filename", "heatmap_percentage",
                  "trimming_ends", "trim_i5", "trim_i7", "spike_order"]
 
@@ -61,7 +61,7 @@ def check_parameters(parameters_dict):
         exit(5)
 
     # Checks if max different nucleotides of sequences is numeric
-    if not parameters_dict["diff_seq"].isdecimal():
+    if not parameters_dict["diff_spike"].isdecimal():
         print("Error 6: Entered maximum nucleotide difference between"
               "sequences is not numeric.")
         exit(6)
@@ -90,19 +90,22 @@ def check_parameters(parameters_dict):
     except ValueError:
         print("Error 16: Entered heatmap contamination percentage is not a number.")
 
-    # Checks if max different nucleotides of sequences is numeric
-    if not parameters_dict["trimming_ends"].isdecimal():
-        print("Error 17: Entered spike-ins trimming value is not numeric.")
+    # Checks if trimming ends value is numeric
+    if parameters_dict["trimming_ends"] not in ["1", "2"]:
+        print("Error 17: Entered spike-ins trimming value is incorrect.")
         exit(17)
 
+    # Checks if trimming i5 end value is numeric
     if not parameters_dict["trim_i5"].isdecimal():
         print("Error 18: Entered spike-ins i5 trimming value is not numeric.")
         exit(18)
 
+    # Checks if trimming i7 end value is numeric
     if not parameters_dict["trim_i7"].isdecimal():
         print("Error 19: Entered spike-ins i7 trimming value is not numeric.")
         exit(19)
 
+    # Checks if spike order value is numeric
     if not parameters_dict["spike_order"].isdecimal():
         print("Error 20: Entered spike-ins order value is not numeric.")
         exit(20)

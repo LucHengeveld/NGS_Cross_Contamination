@@ -18,7 +18,9 @@
 14) file_readers.py: Error 14: Barcode file format incorrect.
 15) file_readers.py: Error 15: Barcode file format incorrect.
 16) parameters.py: Error 16: Entered heatmap contamination percentage is not a number.
-17) parameters.py: Error 17:  Entered spike-ins trimming value is not numeric.
+17) parameters.py: Error 17:  Entered spike-ins trimming value is incorrect.
 18) parameters.py: Error 18: Entered spike-ins i5 trimming value is not numeric.
 19) parameters.py: Error 19: Entered spike-ins i7 trimming value is not numeric.
 20) Parameters.py: Error 20: Entered spike-ins order value is not numeric.
+21) file_readers.py: Error 21: Fasta file format is incorrect. No headers or sequences found.
+22) file_readers.py: Error 22: Entered fastq file has not been found.
