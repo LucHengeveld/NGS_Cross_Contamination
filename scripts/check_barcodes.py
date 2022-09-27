@@ -2,7 +2,9 @@ from Levenshtein import distance
 import re
 
 
-def barc_no_spike(barcode_file_data, fastq_data, diff_bar_nucl):
+def barc_no_spike(barcode_file_data, fastq_data, diff_bar_nucl,
+                  correct_i5_list, correct_i7_list, i5_i7_combinations):
+    # TODO: Add last 3 params to docstring
     """
     Checks and counts the different possible i5 + i7 combinations.
     :param barcode_file_data: List with all barcodes from the Excel file.
@@ -20,28 +22,6 @@ def barc_no_spike(barcode_file_data, fastq_data, diff_bar_nucl):
     """
     # TODO: Split function into smaller ones
     # TODO: Filter out unknown barcodes that contain homopolymers (AAAA etc)
-    # Creates empty lists
-    correct_i5_list = []
-    correct_i7_list = []
-
-    # Splits the barcodes from the Excel file into i5 and i7
-    for line in barcode_file_data:
-        i5, i7 = line[1].split("+")
-        correct_i5_list.append(i5)
-        correct_i7_list.append(i7)
-
-    # Creates an empty dictionary
-    i5_i7_combinations = {}
-
-    # Creates a dictionary with every possible i5 + i7 combination and
-    # set the amount of occurrences to 0
-    for i5 in correct_i5_list:
-        for i7 in correct_i7_list:
-            if i5 not in i5_i7_combinations.keys():
-                i5_i7_combinations[i5] = {i7: 0}
-            else:
-                i5_i7_combinations[i5][i7] = 0
-
     # Creates an empty list
     unknown_barcodes = {}
     unknown_i5 = {}
@@ -133,6 +113,51 @@ def barc_no_spike(barcode_file_data, fastq_data, diff_bar_nucl):
 
     # Returns i5_i7_combinations and unknown_barcodes to main function
     return i5_i7_combinations, unknown_barcodes, unknown_i5, unknown_i7
+
+
+def barc_with_spike(barcode_file_data, fastq_data, diff_bar_nucl,
+                    diff_spike_nucl):
+    # TODO: Docstrings and comments
+    # output: list with dictionaries [i5+i7+spike, i5+spike, i7+spike, unknown barcodes/spike ins etc]
+    output_dicts = ["i5_i7_spike", "i5_spike", "i7_spike", "unknown_i5",
+                    "unknown_i7", "unknown_spike", "Unknown_i5_i7",
+                    "unknown_i5_spike", "unknown_i7_spike",
+                    "unknown_i5_i7_spike"]
+    output_data = {}
+    for dict_name in output_dicts:
+        output_data[dict_name] = None
+    print(output_data)
+
+    # eerste 3 opslaan als dicts want barcodes en sequenties bekend,
+    # rest als lijsten want barcodes en sequenties onbekend
+    pass
+
+
+def retrieve_correct_barcodes_combinations(barcode_file_data):
+    # TODO: Docstrings
+    # Creates empty lists
+    correct_i5_list = []
+    correct_i7_list = []
+
+    # Splits the barcodes from the Excel file into i5 and i7
+    for line in barcode_file_data:
+        i5, i7 = line[1].split("+")
+        correct_i5_list.append(i5)
+        correct_i7_list.append(i7)
+
+    # Creates an empty dictionary
+    i5_i7_combinations = {}
+
+    # Creates a dictionary with every possible i5 + i7 combination and
+    # set the amount of occurrences to 0
+    for i5 in correct_i5_list:
+        for i7 in correct_i7_list:
+            if i5 not in i5_i7_combinations.keys():
+                i5_i7_combinations[i5] = {i7: 0}
+            else:
+                i5_i7_combinations[i5][i7] = 0
+
+    return correct_i5_list, correct_i7_list, i5_i7_combinations
 
 
 def retrieve_barcode_location(barcode_file_data):

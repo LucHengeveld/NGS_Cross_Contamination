@@ -3,8 +3,8 @@ from scripts import file_readers as fr, parameters as pm, \
     calculate_contamination as cc, check_barcodes as cb, file_writers as fw
 
 import time
-start_time = time.time()
 
+start_time = time.time()
 
 if __name__ == "__main__":
     # TODO: Docstrings / comments.
@@ -15,14 +15,6 @@ if __name__ == "__main__":
 
     # Checks if the parameters have been entered correctly by the user
     file_extension = pm.check_parameters(parameters_dict)
-
-    # If the file has a bcl file extension, it will convert it to a
-    # .fastq file and calls the fastq_reader function
-    # if file_extension == "bcl":
-    #     fastq_file = fr.bcl_to_fastq(parameters_dict)
-    #     fastq_dict = fr.fastq_reader(fastq_file)
-    # else:
-    #     fastq_dict = fr.fastq_reader(parameters_dict["fastq_file_path"])
 
     print("Retrieve barcodes from barcode file", time.strftime("%H:%M"))
     # Retrieves the data from the barcode Excel file
@@ -42,9 +34,12 @@ if __name__ == "__main__":
         print("Compare barcodes", time.strftime("%H:%M"))
         # Compare all fastq barcode sequences to the ones from the
         # input Excel file
+        correct_i5_list, correct_i7_list, i5_i7_combinations = \
+            cb.retrieve_correct_barcodes_combinations(barcode_file_data)
         i5_i7_combinations, unknown_barcodes, unknown_i5, unknown_i7 = \
             cb.barc_no_spike(barcode_file_data, fastq_data,
-                             parameters_dict["diff_barc"])
+                             parameters_dict["diff_barc"], correct_i5_list,
+                             correct_i7_list, i5_i7_combinations)
 
         print("Retrieve output filename and location", time.strftime("%H:%M"))
         # Saves the output file location and name to a variable
@@ -56,27 +51,56 @@ if __name__ == "__main__":
             print("Retrieve well locations", time.strftime("%H:%M"))
             i5_i7_loc = cb.retrieve_barcode_location(barcode_file_data)
 
-            print("Write comb data to excel output file", time.strftime("%H:%M"))
+            print("Write comb data to excel output file",
+                  time.strftime("%H:%M"))
             # Write data to Excel output file
             fw.no_spike_output(i5_i7_combinations, unknown_barcodes,
                                unknown_i5, unknown_i7, output_file, i5_i7_loc,
                                parameters_dict["indexing"],
                                parameters_dict["heatmap_percentage"])
         else:
-
-            print("Write uniq data to excel output file", time.strftime("%H:%M"))
+            print("Write uniq data to excel output file",
+                  time.strftime("%H:%M"))
             # Write data to Excel output file
             fw.no_spike_output(i5_i7_combinations, unknown_barcodes,
                                unknown_i5, unknown_i7, output_file, [],
                                parameters_dict["indexing"],
                                parameters_dict["heatmap_percentage"])
 
-    elif parameters_dict["indexing"] == "1":
-        # combinatorial spike-ins i5+i7
-        pass
     else:
-        # unique i5+i7 spike-ins
-        pass
+        print("Retrieve barcodes and sequences from fastq file",
+              time.strftime("%H:%M"))
+        # Retrieve the fastq data
+        fastq_data = fr.fastq_reader_with_spike(
+            parameters_dict["fastq_file_path"],
+            parameters_dict["trimming_ends"],
+            int(parameters_dict["trim_i5"]),
+            int(parameters_dict["trim_i7"]))
+
+        print("Compare barcodes and sequences from fastq file",
+              time.strftime("%H:%M"))
+        # 2. Compare barcodes and sequences
+        #   - Add counter for every correct and incorrect combination
+        #   - i5+i7 and spike, i5 and spike, i7 and spike
+        #   - i5 / i7 / unknown spike / i5+i7 / i5+spike / i7+spike / unknown i5+i7+spike
+        cb.barc_with_spike(barcode_file_data, fastq_data,
+                           int(parameters_dict["diff_barc"]),
+                           int(parameters_dict["diff_spike"]))
+
+        exit("compare barcodes and sequences")
+
+        # 3. Create a 2d list for Excel output tables.
+        #   - i5+i7 and spike, i5 and spike, i7 and spike
+        # 4. Write data to excel file in multiple tabs (10 total)
+        #   - i5+i7+spike, i5+spike, i7+spike
+        #   - Unknown spike, i5, i7, i5+i7, i5+spike, i7+spike, unknown i5+i7+spike
+        if parameters_dict["indexing"] == "1":
+            # combinatorial spike-ins i5+i7
+
+            pass
+        else:
+            # unique i5+i7 spike-ins
+            pass
 
         # Unfinished spike-ins code:
         # Spike in sequences:
