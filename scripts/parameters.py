@@ -30,6 +30,13 @@ def retrieve_parameters(parameters_file):
 def check_parameters(parameters_dict):
     # TODO: Add docstrings to this function.
 
+    # Checks if all parameters have been entered
+    # TODO: Update 14 if more params are added
+    if len(parameters_dict.keys()) < 14:
+        print("Error 9: Missing one of the parameters. Make sure you have "
+              "entered all parameters in parameters.txt")
+        exit(9)
+
     # Checks if the entered fastq/bcl file has the correct extension
     if not parameters_dict["fastq_file_path"].split(".")[1] in ["bcl",
                                                                 "fastq"]:
@@ -75,13 +82,6 @@ def check_parameters(parameters_dict):
     if not os.path.isdir(parameters_dict["output_dir"]):
         print("Error 8: Entered output directory path does not exist.")
         exit(8)
-
-    # Checks if all parameters have been entered
-    # TODO: Update 14 if more params are added
-    if len(parameters_dict.keys()) < 14:
-        print("Error 9: Missing one of the parameters. Make sure you have "
-              "entered all parameters in parameters.txt")
-        exit(9)
 
     # Checks if entered heatmap contamination percentage is a number
     try:
