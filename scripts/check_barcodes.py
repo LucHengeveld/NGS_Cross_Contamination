@@ -1,6 +1,7 @@
+from scripts import spike_in_contamination as sic
+
 from Levenshtein import distance
 import re
-from scripts import spike_in_contamination as sic
 
 
 def barc_no_spike(fastq_data, diff_bar_nucl, correct_i5_list,
