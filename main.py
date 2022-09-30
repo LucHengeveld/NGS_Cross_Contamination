@@ -36,10 +36,11 @@ if __name__ == "__main__":
         # input Excel file
         correct_i5_list, correct_i7_list, i5_i7_combinations = \
             cb.retrieve_combinations_no_spike(barcode_file_data)
+
         i5_i7_combinations, unknown_barcodes, unknown_i5, unknown_i7 = \
-            cb.barc_no_spike(barcode_file_data, fastq_data,
-                             parameters_dict["diff_barc"], correct_i5_list,
-                             correct_i7_list, i5_i7_combinations)
+            cb.barc_no_spike(fastq_data, parameters_dict["diff_barc"],
+                             correct_i5_list, correct_i7_list,
+                             i5_i7_combinations)
 
         print("Retrieve output filename and location", time.strftime("%H:%M"))
         # Saves the output file location and name to a variable
@@ -86,11 +87,11 @@ if __name__ == "__main__":
 
         print("Compare barcodes and sequences from fastq file",
               time.strftime("%H:%M"))
-        cb.barc_with_spike(combinations, correct_spike_list, correct_i5_list,
-                           correct_i7_list, fastq_data,
-                           int(parameters_dict["diff_barc"]),
-                           int(parameters_dict["diff_spike"]),
-                           int(parameters_dict["spike_ins"]))
+        unknown_dict, combinations = cb.barc_with_spike(
+            combinations, correct_spike_list, correct_i5_list, correct_i7_list,
+            fastq_data, int(parameters_dict["diff_barc"]),
+            int(parameters_dict["diff_spike"]),
+            int(parameters_dict["spike_ins"]))
 
         # 3. Create a 2d list for Excel output tables.
         #   - i5+i7 and spike, i5 and spike, i7 and spike
