@@ -4,7 +4,8 @@ from Levenshtein import distance
 def bar_spike(barcode, bar_type, combinations, spike_seq, unknown_dict,
               correct_bar_list, correct_spike_list):
     """
-
+    Checks if the barcode and spike-in sequences are unknown or if they exist
+    in the entered barcode file.
     :param barcode: The sequence of the i5, i7 or i5+i7 barcode.
     :param bar_type: Type of the barcode (i5, i7 or i5+i7).
     :param combinations: Dictionary containing every possible barcode +
