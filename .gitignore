@@ -300,5 +300,7 @@ cython_debug/
 
 # End of https://www.toptal.com/developers/gitignore/api/python,pycharm,visualstudiocode
 
-# Ignore the output directory
+# Ignore the input and output directories
+/barcode_testfiles/
+/fastq_testfiles/
 /output/
