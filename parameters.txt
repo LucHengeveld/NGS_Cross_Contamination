@@ -2,10 +2,10 @@
 
 # What is the .fastq or .bcl file path? Example: C:\Users\Biolegio\example.fastq
 # fastq_testfiles\uniq_fastq_no_spike.fastq
-fastq_testfiles\comb_fastq_spike.fastq
+fastq_testfiles\comb_fastq_spike_small.fastq
 
 # What is the barcode (and spike-in sequence) file? Example: C:\Users\Biolegio\example.txt
-barcode_testfiles\comb_barcode_spike.xlsx
+barcode_testfiles\comb_barcode_spike_small.xlsx
 
 # Is the plate created by using combinatorial indexing (1) or unique dual indexing (2)?
 1
@@ -15,7 +15,7 @@ barcode_testfiles\comb_barcode_spike.xlsx
 # (2) Spike ins + i5
 # (3) Spike ins + i7
 # (4) Spike ins + i5+i7
-1
+4
 
 # How many nucleotides are the found barcodes allowed to differ from the original barcodes?
 0
