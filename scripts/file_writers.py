@@ -159,6 +159,7 @@ def heatmap(excel_2d_list, i, j, workbook, heatmap_percentage):
     :param heatmap_percentage: Parameter of the maximum allowed contamination.
     :return bg_format: Background color format for a specific cell.
     """
+    # TODO: Add 3 colors to heatmap (green -> yellow -> red)
     # Checks if cell values should be compared to the correct barcode
     # value in its row or column and calculates the max amount of
     # contaminated reads
