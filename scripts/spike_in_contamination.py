@@ -1,6 +1,9 @@
 from Levenshtein import distance
 
 
+# TODO: Rewrite / improve all functions by creating 3 functions: i5/i7/spike
+#  with param seq/bar diff and return booleans (if using diff param also return
+#  correct barcodes/sequences).
 def bar_spike(barcode, bar_type, combinations, spike_seq, unknown_dict,
               correct_bar_list, correct_spike_list):
     """
@@ -218,6 +221,20 @@ def bar_spike_bar_seq_diff(barcode, bar_type, combinations, spike_seq,
 # TODO: Docstrings / comments in every i5_i7_spike function
 def i5_i7_spike(barcode, combinations, spike_seq, unknown_dict,
                 correct_i5_list, correct_spike_list):
+    # Opties:
+    #   - i5+i7+spike correct
+    #   - i5+i7 correct
+    #   - i5+spike correct
+    #   - i7+spike correct
+    #   - i5 correct
+    #   - i7 correct
+    #   - spike correct
+    # Mogelijke opties:
+    #   - i5 check met / zonder diff -> return bool
+    #   - i7 check met / zonder diff -> return bool
+    #   - spike check met / zonder diff -> return bool
+    # 3 functies met parameter de difference
+
     return unknown_dict, combinations
 
 
