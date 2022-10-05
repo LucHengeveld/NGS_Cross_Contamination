@@ -1,6 +1,5 @@
 # Imports the other python scripts
-from scripts import file_readers as fr, parameters as pm, \
-    calculate_contamination as cc, check_barcodes as cb, file_writers as fw
+from scripts import file_readers as fr, parameters as pm, check_barcodes as cb, file_writers as fw
 
 import time
 
@@ -21,6 +20,10 @@ if __name__ == "__main__":
         settings.SEQUENCER,
         settings.ANALYSE_COMBINATION)
 
+    # Saves the output file location and name to a variable
+    print("Retrieve output filename and location", time.strftime("%H:%M"))
+    output_file = settings.OUTPUT_DIR + settings.OUTPUT_FILENAME + ".xlsx"
+
     # Combinatorial and unique dual indexing without spike-in sequence
     if settings.ANALYSE_COMBINATION == "1":
 
@@ -40,10 +43,6 @@ if __name__ == "__main__":
             cb.barc_no_spike(fastq_data, settings.BARC_DIFF,
                              correct_i5_list, correct_i7_list,
                              i5_i7_combinations)
-
-        # Saves the output file location and name to a variable
-        print("Retrieve output filename and location", time.strftime("%H:%M"))
-        output_file = settings.OUTPUT_DIR + settings.OUTPUT_FILENAME + ".xlsx"
 
         if settings.INDEXING == "1":
             # Retrieve barcode well locations
@@ -76,21 +75,24 @@ if __name__ == "__main__":
         # Retrieve all possible barcode and spike-in combinations
         print("Create dict of all possible combinations",
               time.strftime("%H:%M"))
-        combinations, correct_spike_list, correct_i5_list, correct_i7_list = \
-            cb.retrieve_combinations_with_spike(barcode_file_data,
-                                                settings.ANALYSE_COMBINATION)
+        combinations, correct_spike_list, correct_i5_list, correct_i7_list, \
+            well_locations = cb.retrieve_combinations_with_spike(
+                barcode_file_data,
+                settings.ANALYSE_COMBINATION)
 
         # Compare all fastq barcodes to the ones found in the barcode +
         # spike-in file
         print("Compare barcodes and sequences from fastq file",
               time.strftime("%H:%M"))
+        # TODO: i5+i7+spike
         unknown_dict, combinations = cb.barc_with_spike(
             combinations, correct_spike_list, correct_i5_list, correct_i7_list,
             fastq_data, settings.BARC_DIFF, settings.SPIKE_DIFF,
             settings.ANALYSE_COMBINATION)
 
-        # 3. Create a 2d list for Excel output tables.
-        #   - i5+i7 and spike, i5 and spike, i7 and spike
+        print("Write data to output Excel file", time.strftime("%H:%M"))
+        fw.excel_writer(correct_i5_list, correct_i7_list, correct_spike_list, well_locations, unknown_dict, combinations, output_file, settings.MAX_CONTAMINATION, settings.ANALYSE_COMBINATION)
+
         # 4. Write data to excel file in multiple tabs (10 total)
         #   - i5+i7+spike, i5+spike, i7+spike
         #   - Unknown spike, i5, i7, i5+i7, i5+spike, i7+spike, unknown i5+i7+spike
