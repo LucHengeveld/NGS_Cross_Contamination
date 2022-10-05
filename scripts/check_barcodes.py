@@ -189,7 +189,6 @@ def barc_with_spike(combinations, correct_spike_list, correct_i5_list,
                 # Calls correct functions depending on diff_bar_nucl and
                 # diff_seq_nucl parameters
                 if diff_seq_nucl == 0:
-
                     # Bar diff = 0 and seq diff = 0
                     unknown_dict, combinations = sic.bar_spike(
                         barcode, bar_type, combinations, spike_seq,
@@ -298,11 +297,11 @@ def retrieve_combinations_no_spike(barcode_file_list):
     return correct_i5_list, correct_i7_list, i5_i7_combinations
 
 
-def retrieve_combinations_with_spike(barcode_file_dict, spike_ins):
+def retrieve_combinations_with_spike(barcode_file_dict, analyse_combination):
     """
     Creates a dictionary with all possible barcode combinations.
     :param barcode_file_dict: List with all barcodes from the Excel file.
-    :param spike_ins: Parameter from parameters.txt.
+    :param analyse_combination: Parameter from parameters.txt.
     :return combinations: Dictionary containing every possible barcode +
             spike-in sequence combination. Structure depends on spike-ins
             parameter.
@@ -317,6 +316,7 @@ def retrieve_combinations_with_spike(barcode_file_dict, spike_ins):
     correct_i5_list = []
     correct_i7_list = []
     correct_spike_list = []
+    well_locations = []
 
     # Splits the barcodes from the Excel file into i5 and i7
     for barcode in barcode_file_dict:
@@ -324,16 +324,17 @@ def retrieve_combinations_with_spike(barcode_file_dict, spike_ins):
         correct_i5_list.append(i5)
         correct_i7_list.append(i7)
         correct_spike_list.append(barcode_file_dict[barcode][1])
+        well_locations.append(barcode_file_dict[barcode][0])
 
     # Creates empty dictionary
     combinations = {}
 
     # Creates a dictionary with every possible combination and set the
     # amount of occurrences to 0
-    if spike_ins in [2, 3]:
+    if analyse_combination in [2, 3]:
 
         # Use correct list depending on spike_ins parameter
-        if spike_ins == 2:
+        if analyse_combination == 2:
             correct_barcode_list = correct_i5_list
         else:
             correct_barcode_list = correct_i7_list
@@ -361,7 +362,7 @@ def retrieve_combinations_with_spike(barcode_file_dict, spike_ins):
 
     # Returns the combinations dict and correct i5, i7 and spike
     # sequence lists
-    return combinations, correct_spike_list, correct_i5_list, correct_i7_list
+    return combinations, correct_spike_list, correct_i5_list, correct_i7_list, well_locations
 
 
 def retrieve_barcode_location(barcode_file_data):
