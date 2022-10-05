@@ -36,13 +36,13 @@ def fastq_reader_no_spike(fastq_path):
         exit(11)
 
 
-def barcode_file_reader(barcode_file, sequencing_method, spike_ins):
+def barcode_file_reader(barcode_file, sequencing_method, analyse_combination):
     """
     Retrieves the barcodes (and spike in sequences if spike_in parameter is
     '2') from the entered Excel file.
     :param barcode_file: Path to the Excel file.
     :param sequencing_method: Parameter from parameters.txt.
-    :param spike_ins: Parameter from parameters.txt.
+    :param analyse_combination: Parameter from parameters.txt.
     :return barcode_file_list: List with all barcodes from the Excel file.
     :return barcode_file_dict: Dictionary with structure {barcode: [well, spike
             seq, 0]}.
@@ -62,13 +62,13 @@ def barcode_file_reader(barcode_file, sequencing_method, spike_ins):
     barcode_file_dict = {}
 
     # Checks sequencing method to retrieve correct i5 column
-    if sequencing_method == "1":
+    if sequencing_method == 1:
         i5 = 8
     else:
         i5 = 9
     try:
         # Checks spike in parameter
-        if spike_ins == "1":
+        if analyse_combination == 1:
             # Retrieve barcodes from the Excel file
             for row in sheet.iter_rows(min_row=4, values_only=True):
                 barcode_file_list.append([row[0], row[i5] + "+" + row[4]])
