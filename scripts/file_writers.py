@@ -167,12 +167,12 @@ def excel_writer(correct_i5_list, correct_i7_list, correct_spike_list,
         # i5+spike
         file_writer_bar_spike(correct_i5_list, correct_spike_list,
                               well_locations, combinations, output_file,
-                              analyse_combination)
+                              analyse_combination, unknown_dict)
     elif analyse_combination == 3:
         # i7+spike
         file_writer_bar_spike(correct_i7_list, correct_spike_list,
                               well_locations, combinations, output_file,
-                              analyse_combination)
+                              analyse_combination, unknown_dict)
     else:
         # i5+i7+spike
         pass
@@ -180,7 +180,7 @@ def excel_writer(correct_i5_list, correct_i7_list, correct_spike_list,
 
 def file_writer_bar_spike(correct_bar_list, correct_spike_list,
                           well_locations, combinations, output_file,
-                          analyse_combination):
+                          analyse_combination, unknown_dict):
     # TODO: Docstrings and comments
     if analyse_combination == 2:
         excel_2d_list = [["", "", "i5 barcodes →"], ["Well", "Spike-in"]]
@@ -206,21 +206,63 @@ def file_writer_bar_spike(correct_bar_list, correct_spike_list,
     excel_2d_list.append(["", "Total"])
 
     col_tot = []
-    for row in range(2, len(excel_2d_list)-1):
+    for row in range(2, len(excel_2d_list) - 1):
         excel_2d_list[row].append(sum(excel_2d_list[row][2:]))
-        for value in range(2, len(excel_2d_list[row])-1):
-            if len(col_tot) != len(excel_2d_list[row])-3:
+        for value in range(2, len(excel_2d_list[row]) - 1):
+            if len(col_tot) != len(excel_2d_list[row]) - 3:
                 col_tot.append(excel_2d_list[row][value])
             else:
-                col_tot[value-2] += excel_2d_list[row][value]
+                col_tot[value - 2] += excel_2d_list[row][value]
     excel_2d_list[-1].extend(col_tot)
     with xlsxwriter.Workbook(output_file) as workbook:
         contamination_table = workbook.add_worksheet(excel_tabname)
+
         # Loops through the data and writes it to an Excel sheet with
         # the correct cell format (bold / green background)
         for i in range(len(excel_2d_list)):
             for j in range(len(excel_2d_list[i])):
                 contamination_table.write(i, j, excel_2d_list[i][j])
+
+        if analyse_combination == 2:
+            unknown_bar = workbook.add_worksheet("unknown_i5")
+            unknown_bar.write_row(0, 0, ["i5 barcode", "Occurrences"])
+
+            unknown_bar_spike = workbook.add_worksheet("unknown_i5_spike")
+            unknown_bar_spike.write_row(0, 0, ["i5 barcode",
+                                               "Spike-in sequence",
+                                               "Occurrences"])
+            barcode = "i5"
+        else:
+            unknown_bar = workbook.add_worksheet("unknown_i7")
+            unknown_bar.write_row(0, 0, ["i7 barcode", "Occurrences"])
+
+            unknown_bar_spike = workbook.add_worksheet("unknown_i7_spike")
+            unknown_bar_spike.write_row(0, 0, ["i7 barcode",
+                                               "Spike-in sequence",
+                                               "Occurrences"])
+            barcode = "i7"
+
+        unknown_spike = workbook.add_worksheet("unknown_spike")
+
+        row = 1
+        for bar in unknown_dict[barcode]:
+            unknown_bar.write_row(row, 0, [bar,
+                                           unknown_dict[barcode][bar]])
+            row += 1
+
+        row = 1
+        unknown_spike.write_row(0, 0, ["Spike-in sequence", "Occurrences"])
+        for spike in unknown_dict["spike"]:
+            unknown_spike.write_row(row, 0, [spike,
+                                             unknown_dict["spike"][spike]])
+            row += 1
+
+        row = 1
+        for bar in unknown_dict[barcode + "_spike"]:
+            for spike in unknown_dict[barcode + "_spike"][bar]:
+                unknown_bar_spike.write_row(row, 0, [bar, spike,
+                            unknown_dict[barcode + "_spike"][bar][spike]])
+            row += 1
 
 
 def heatmap(excel_2d_list, i, j, workbook, heatmap_percentage):
