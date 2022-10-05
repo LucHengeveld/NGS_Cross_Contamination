@@ -2,7 +2,8 @@ import xlsxwriter
 
 
 def no_spike_output(i5_i7_combinations, unknown_barcodes, unknown_i5,
-                    unknown_i7, output_file, i5_i7_loc, indexing, heatmap_percentage):
+                    unknown_i7, output_file, i5_i7_loc, indexing,
+                    max_contamination):
     """
     Creates the output Excel file for unique dual (non-redundant) indexing with
     no spike-in sequence.
@@ -20,7 +21,7 @@ def no_spike_output(i5_i7_combinations, unknown_barcodes, unknown_i5,
             corresponding well locations. Dictionary has the structure:
             {i5: ["A" {i7: 1, i7: 2}]}.
     :param indexing: Parameter of the used indexing method.
-    :param heatmap_percentage: Parameter of the maximum allowed contamination.
+    :param max_contamination: Parameter of the maximum allowed contamination.
     :return: Excel output file at entered location.
     """
     # TODO: Split this function into multiple ones.
@@ -85,7 +86,9 @@ def no_spike_output(i5_i7_combinations, unknown_barcodes, unknown_i5,
 
         # Adds borders around the data
         border_format = workbook.add_format({'border': 1})
-        contamination_table.conditional_format(1, 1, rows, cols, {'type': 'no_blanks', 'format': border_format})
+        contamination_table.conditional_format(1, 1, rows, cols,
+                                               {'type': 'no_blanks',
+                                                'format': border_format})
 
         # Loops through the data and writes it to an Excel sheet with
         # the correct cell format (bold / green background)
@@ -107,7 +110,7 @@ def no_spike_output(i5_i7_combinations, unknown_barcodes, unknown_i5,
                         contamination_table.write(i, j, excel_2d_list[i][j],
                                                   heatmap(excel_2d_list, i, j,
                                                           workbook,
-                                                          heatmap_percentage))
+                                                          max_contamination))
                 else:
                     contamination_table.write(i, j, excel_2d_list[i][j])
 
@@ -147,6 +150,63 @@ def no_spike_output(i5_i7_combinations, unknown_barcodes, unknown_i5,
                                        [list(unknown_i7.keys())[row],
                                         unknown_i7[list(unknown_i7.keys()
                                                         )[row]]])
+
+
+def excel_writer(correct_i5_list, correct_i7_list, correct_spike_list,
+                 well_locations, unknown_dict, combinations, output_file,
+                 max_contamination, analyse_combination):
+    # Needed:
+    #   - Order spike-in sequences
+    #   - Known and unknown combinations
+    #   - Output file
+    # TODO: Docstrings and comments
+    if analyse_combination == 1:
+        # TODO: call functions for i5+i7 without spike filewriter
+        pass
+    elif analyse_combination == 2:
+        # i5+spike
+        file_writer_bar_spike(correct_i5_list, correct_spike_list,
+                              well_locations, combinations, output_file,
+                              analyse_combination)
+    elif analyse_combination == 3:
+        # i7+spike
+        file_writer_bar_spike(correct_i7_list, correct_spike_list,
+                              well_locations, combinations, output_file,
+                              analyse_combination)
+    else:
+        # i5+i7+spike
+        pass
+
+
+def file_writer_bar_spike(correct_bar_list, correct_spike_list,
+                          well_locations, combinations, output_file,
+                          analyse_combination):
+    if analyse_combination == 2:
+        excel_2d_list = [["", "", "i5 barcodes →"], ["Well", "Spike-in"]]
+    else:
+        excel_2d_list = [["", "", "i7 barcodes →"], ["Well", "Spike-in"]]
+
+    for i in range(len(well_locations)):
+        excel_2d_list.append([well_locations[i], i + 1])
+
+    added_barc = []
+    for i in range(len(correct_bar_list)):
+        if correct_bar_list[i] not in added_barc:
+            bar = correct_bar_list[i]
+            added_barc.append(bar)
+            excel_2d_list[1].append(bar)
+            for j in range(len(correct_spike_list)):
+                spike = correct_spike_list[j]
+                excel_2d_list[j + 2].append(combinations[bar][spike])
+
+    with xlsxwriter.Workbook(output_file) as workbook:
+        contamination_table = workbook.add_worksheet("Contamination Table")
+        # Loops through the data and writes it to an Excel sheet with
+        # the correct cell format (bold / green background)
+        for i in range(len(excel_2d_list)):
+            for j in range(len(excel_2d_list[i])):
+                contamination_table.write(i, j, excel_2d_list[i][j])
+    print("done")
 
 
 def heatmap(excel_2d_list, i, j, workbook, heatmap_percentage):
