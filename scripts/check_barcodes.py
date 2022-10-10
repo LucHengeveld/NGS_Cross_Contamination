@@ -125,7 +125,7 @@ def barc_no_spike(fastq_data, diff_bar_nucl, correct_i5_list,
 
 def barc_with_spike(combinations, correct_spike_list, correct_i5_list,
                     correct_i7_list, fastq_data, diff_bar_nucl, diff_seq_nucl,
-                    spike_ins):
+                    analyse_combination):
     """
     Compares all fastq barcodes and spike-ins sequences to the barcode and
     spike-ins sequence file.
@@ -142,7 +142,7 @@ def barc_with_spike(combinations, correct_spike_list, correct_i5_list,
             sequence], etc].
     :param diff_bar_nucl: Parameter from parameters.txt.
     :param diff_seq_nucl: Parameter from parameters.txt.
-    :param spike_ins: Parameter from parameters.txt.
+    :param analyse_combination: Parameter from parameters.txt.
     :return unknown_dict: Dictionary containing all unknown barcodes and
             spike-in sequences.
     :return combinations: Dictionary containing every possible barcode +
@@ -168,8 +168,8 @@ def barc_with_spike(combinations, correct_spike_list, correct_i5_list,
 
         # Checks if spike-ins parameter has value 2 (i5+spike) or 3
         # (i7+spike)
-        if spike_ins in [2, 3]:
-            if spike_ins == 2:
+        if analyse_combination in [2, 3]:
+            if analyse_combination == 2:
                 # Saves the i5 barcode and correct barcode list to a
                 # variable
                 barcode = read[0]
@@ -220,7 +220,7 @@ def barc_with_spike(combinations, correct_spike_list, correct_i5_list,
         else:
 
             # Saves the i5+i7 barcode to a variable
-            barcode = read[0] + "+" + read[1]
+            barcode = [read[0], read[1]]
 
             # Calls correct functions depending on diff_bar_nucl and
             # diff_seq_nucl parameters
@@ -230,7 +230,7 @@ def barc_with_spike(combinations, correct_spike_list, correct_i5_list,
                     # Bar diff = 0 and seq diff = 0
                     unknown_dict, combinations = sic.i5_i7_spike(
                         barcode, combinations, spike_seq, unknown_dict,
-                        correct_i5_list, correct_spike_list)
+                        correct_i5_list, correct_i7_list, correct_spike_list)
 
                 else:
                     # Bar diff = 0 and seq diff != 0
