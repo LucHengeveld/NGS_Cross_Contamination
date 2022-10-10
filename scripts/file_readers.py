@@ -1,13 +1,6 @@
 import openpyxl
 
 
-def bcl_to_fastq(parameters_dict):
-    # TODO: Code for converting .bcl to .fastq and its parameters (like min quality). Not sure if doable due to requirements for Illumina tool
-    # https://support.illumina.com/content/dam/illumina-support/documents/documentation/software_documentation/bcl2fastq/bcl2fastq2-v2-20-software-guide-15051736-03.pdf
-    fastq_file = ""
-    return fastq_file
-
-
 def fastq_reader_no_spike(fastq_path):
     """
     Reads and saves the info from the .fastq file to a list.
