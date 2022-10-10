@@ -1,5 +1,6 @@
 # Imports the other python scripts
-from scripts import file_readers as fr, parameters as pm, check_barcodes as cb, file_writers as fw
+from scripts import file_readers as fr, parameters as pm, check_barcodes as cb, \
+    file_writers as fw
 
 import time
 
@@ -7,6 +8,7 @@ start_time = time.time()
 
 if __name__ == "__main__":
     # TODO: Docstrings / comments.
+    # TODO: Update old parameter.txt docstrings in all functions
     # Main function of the script, calls the different functions
 
     # Checks if the parameters have been entered correctly by the user
@@ -25,7 +27,7 @@ if __name__ == "__main__":
     output_file = settings.OUTPUT_DIR + settings.OUTPUT_FILENAME + ".xlsx"
 
     # Combinatorial and unique dual indexing without spike-in sequence
-    if settings.ANALYSE_COMBINATION == "1":
+    if settings.ANALYSE_COMBINATION == 1:
 
         # Retrieve barcodes from fastq file
         print("Retrieve barcodes from fastq file", time.strftime("%H:%M"))
@@ -77,8 +79,7 @@ if __name__ == "__main__":
               time.strftime("%H:%M"))
         combinations, correct_spike_list, correct_i5_list, correct_i7_list, \
             well_locations = cb.retrieve_combinations_with_spike(
-                barcode_file_data,
-                settings.ANALYSE_COMBINATION)
+                barcode_file_data, settings.ANALYSE_COMBINATION)
 
         # Compare all fastq barcodes to the ones found in the barcode +
         # spike-in file
@@ -91,18 +92,21 @@ if __name__ == "__main__":
             settings.ANALYSE_COMBINATION)
 
         print("Write data to output Excel file", time.strftime("%H:%M"))
-        fw.excel_writer(correct_i5_list, correct_i7_list, correct_spike_list, well_locations, unknown_dict, combinations, output_file, settings.MAX_CONTAMINATION, settings.ANALYSE_COMBINATION)
+        # Checks if you would like to analyse i5+spike or i7+spike
+        if settings.ANALYSE_COMBINATION in [2, 3]:
+            # Write data to output Excel file
+            fw.excel_writer(correct_i5_list, correct_i7_list, correct_spike_list,
+                            well_locations, unknown_dict, combinations,
+                            output_file, settings.MAX_CONTAMINATION,
+                            settings.ANALYSE_COMBINATION)
 
-        # 4. Write data to excel file in multiple tabs (10 total)
-        #   - i5+i7+spike, i5+spike, i7+spike
-        #   - Unknown spike, i5, i7, i5+i7, i5+spike, i7+spike, unknown i5+i7+spike
-        if settings.INDEXING == "1":
-            # combinatorial spike-ins i5+i7
-
-            pass
         else:
-            # unique i5+i7 spike-ins
-            pass
+            if settings.INDEXING == 1:
+                # combinatorial spike-ins i5+i7
+                pass
+            else:
+                # unique i5+i7 spike-ins
+                pass
 
         # Unfinished spike-ins code:
         # Spike in sequences:
@@ -118,4 +122,5 @@ if __name__ == "__main__":
         #     # print("No contaminated sequences found.")
         #     pass
 
-print("Code took:", round(time.time() - start_time), "seconds")
+print("Code finished\nScript duration:", round(time.time() - start_time),
+      "seconds")
