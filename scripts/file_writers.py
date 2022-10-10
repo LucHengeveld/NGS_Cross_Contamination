@@ -260,8 +260,8 @@ def file_writer_bar_spike(correct_bar_list, correct_spike_list,
         row = 1
         for bar in unknown_dict[barcode + "_spike"]:
             for spike in unknown_dict[barcode + "_spike"][bar]:
-                unknown_bar_spike.write_row(row, 0, [bar, spike,
-                            unknown_dict[barcode + "_spike"][bar][spike]])
+                unknown_bar_spike.write_row(row, 0, [
+                    bar, spike, unknown_dict[barcode + "_spike"][bar][spike]])
             row += 1
 
 
