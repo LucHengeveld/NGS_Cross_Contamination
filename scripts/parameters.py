@@ -13,7 +13,7 @@ def check_parameters():
 
     # Retrieves the parameters from the setting file
     os.environ["SETTINGS_MODULE"] = 'settings'
-    parameters_dict = {}
+
     try:
         # Checks if the entered fastq/bcl file has the correct extension
         if not settings.FASTQ_FILE.endswith(".fastq"):
@@ -75,10 +75,6 @@ def check_parameters():
             print("Error 19: Entered spike-ins i7 trimming value is not numeric.")
             exit(19)
 
-        # Checks if spike order value is numeric
-        if settings.SPIKE_COUNT_ORDER not in [0, 1, 2]:
-            print("Error 20: Entered spike-ins order value is not numeric.")
-            exit(20)
     except:
         print("Not all parameters have been entered in settings.py.")
         exit(1)
