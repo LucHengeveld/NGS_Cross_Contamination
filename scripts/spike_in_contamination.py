@@ -220,21 +220,47 @@ def bar_spike_bar_seq_diff(barcode, bar_type, combinations, spike_seq,
 
 # TODO: Docstrings / comments in every i5_i7_spike function
 def i5_i7_spike(barcode, combinations, spike_seq, unknown_dict,
-                correct_i5_list, correct_spike_list):
-    # Opties:
-    #   - i5+i7+spike correct
-    #   - i5+i7 correct
-    #   - i5+spike correct
-    #   - i7+spike correct
-    #   - i5 correct
-    #   - i7 correct
-    #   - spike correct
-    # Mogelijke opties:
-    #   - i5 check met / zonder diff -> return bool
-    #   - i7 check met / zonder diff -> return bool
-    #   - spike check met / zonder diff -> return bool
-    # 3 functies met parameter de difference
+                correct_i5_list, correct_i7_list, correct_spike_list):
 
+    i5 = barcode[0]
+    i7 = barcode[1]
+
+    if i5 in correct_i5_list:
+        if i7 in correct_i7_list:
+            if spike_seq in correct_spike_list:
+                # All correct
+                print(1)
+
+            else:
+                # Spike unknown
+                print(2)
+
+        elif spike_seq in correct_spike_list:
+            # i7 unknown
+            print(3)
+
+        else:
+            # i7 and spike unknown
+            print(4)
+
+    elif i7 in correct_i7_list:
+        if spike_seq in correct_spike_list:
+            # i5 unknown
+            print(5)
+
+        else:
+            # i5 and spike unknown
+            print(6)
+
+    elif spike_seq in correct_spike_list:
+        # i5 and i7 unknown
+        print(7)
+
+    else:
+        # all unknown
+        print(8)
+
+    exit("i5+i7+spike")
     return unknown_dict, combinations
 
 
