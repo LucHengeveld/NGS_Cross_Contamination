@@ -228,39 +228,58 @@ def i5_i7_spike(barcode, combinations, spike_seq, unknown_dict,
     if i5 in correct_i5_list:
         if i7 in correct_i7_list:
             if spike_seq in correct_spike_list:
-                # All correct
-                print(1)
+                # i5, i7 and spike-in sequence known
+                combinations[i5 + "+" + i7][spike_seq] += 1
 
             else:
-                # Spike unknown
-                print(2)
+                # Spike-in sequence unknown
+                if spike_seq not in unknown_dict["spike"]:
+                    unknown_dict["spike"].update({spike_seq: 1})
+                else:
+                    unknown_dict["spike"][spike_seq] += 1
 
         elif spike_seq in correct_spike_list:
             # i7 unknown
-            print(3)
+            if i7 not in unknown_dict["i7"]:
+                unknown_dict["i7"].update({i7: 1})
+            else:
+                unknown_dict["i7"][i7] += 1
 
         else:
-            # i7 and spike unknown
-            print(4)
+            # i7 and spike-in sequence are unknown
+            unknown_dict = unknown_bar_spike(i7, unknown_dict, "i7", spike_seq)
 
     elif i7 in correct_i7_list:
         if spike_seq in correct_spike_list:
             # i5 unknown
-            print(5)
-
+            if i5 not in unknown_dict["i5"]:
+                unknown_dict["i5"].update({i5: 1})
+            else:
+                unknown_dict["i5"][i5] += 1
         else:
-            # i5 and spike unknown
-            print(6)
+            # i5 and spike-in sequence are unknown
+            unknown_dict = unknown_bar_spike(i5, unknown_dict, "i5", spike_seq)
 
     elif spike_seq in correct_spike_list:
         # i5 and i7 unknown
-        print(7)
+        if i5 not in unknown_dict["i5_i7"]:
+            unknown_dict["i5_i7"].update({i5: {i7: 1}})
+        elif i7 not in unknown_dict["i5_i7"][i5]:
+            unknown_dict["i5_i7"][i5].update({i7: 1})
+        else:
+            unknown_dict["i5_i7"][i5][i7] += 1
 
     else:
-        # all unknown
-        print(8)
+        # i5, i7 and spike-in sequence unknown
+        if i5 not in unknown_dict["i5_i7_spike"]:
+            unknown_dict["i5_i7_spike"].update({i5: {i7: {spike_seq: 1}}})
+        elif i7 not in unknown_dict["i5_i7_spike"][i5]:
+            unknown_dict["i5_i7_spike"][i5].update({i7: {spike_seq: 1}})
+        elif spike_seq not in unknown_dict["i5_i7_spike"][i5][i7]:
+            unknown_dict["i5_i7_spike"][i5][i7].update({spike_seq: 1})
+        else:
+            unknown_dict["i5_i7"][i5][i7][spike_seq] += 1
 
-    exit("i5+i7+spike")
     return unknown_dict, combinations
 
 
