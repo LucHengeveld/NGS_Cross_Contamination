@@ -6,7 +6,7 @@ FASTQ_FILE = 'fastq_testfiles\\comb_fastq_spike.fastq'
 BARCODE_FILE = 'barcode_testfiles\\comb_barcode_spike.xlsx'
 
 # Is the plate created by using combinatorial indexing (1) or unique dual indexing (2)?
-INDEXING = 1
+INDEXING = 2
 
 # What would you like to analyse?
 # TODO: Add option for both spike i5 and spike i7 together
@@ -14,7 +14,7 @@ INDEXING = 1
 # (2) Spike ins + i5
 # (3) Spike ins + i7
 # (4) Spike ins + i5+i7
-ANALYSE_COMBINATION = 2
+ANALYSE_COMBINATION = 4
 
 # Which sequencer has been used?
 # (1) iSeq / MiniSeq / NextSeq / HiSeq3000 / HiSeq4000
@@ -33,9 +33,9 @@ MAX_CONTAMINATION = 0.1
 OUTPUT_DIR = 'output\\'
 
 # What name would you like to use for the output file?
-OUTPUT_FILENAME = 'comb_i5_spike'
+# OUTPUT_FILENAME = 'comb_i5_spike'
 # OUTPUT_FILENAME = 'comb_i7_spike'
-# OUTPUT_FILENAME = 'comb_i5_i7_spike'
+OUTPUT_FILENAME = 'comb_i5_i7_spike'
 # OUTPUT_FILENAME = 'uniq_i5_spike'
 # OUTPUT_FILENAME = 'uniq_i7_spike'
 # OUTPUT_FILENAME = 'uniq_i5_i7_spike'
@@ -57,8 +57,3 @@ I5_TRIM = 0
 
 # If using spike-ins: how many nucleotides should be trimmed from the i7 end?
 I7_TRIM = 0
-
-# If using spike ins: In which order would you like for the program to count the sequences?
-# (1) Per column: A1=1, B1=2, C1=3, ..., A2=9, B2=10, C2=11, ...
-# (2) Per row: A1=1, A2=2, A3=3, ..., B1=13, B2=14, B2=15, ...
-SPIKE_COUNT_ORDER = 0
