@@ -9,12 +9,12 @@ BARCODE_FILE = 'barcode_testfiles\\comb_barcode_spike.xlsx'
 INDEXING = 2
 
 # What would you like to analyse?
-# TODO: Add option for both spike i5 and spike i7 together
 # (1) i5 + i7
 # (2) Spike ins + i5
 # (3) Spike ins + i7
-# (4) Spike ins + i5+i7
-ANALYSE_COMBINATION = 4
+# (4) Spike ins + i7 and spike ins + i5
+# (5) Spike ins + i5+i7
+ANALYSE_COMBINATION = 2
 
 # Which sequencer has been used?
 # (1) iSeq / MiniSeq / NextSeq / HiSeq3000 / HiSeq4000

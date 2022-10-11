@@ -16,7 +16,7 @@ def no_spike_output(i5_i7_combinations, unknown_barcodes, unknown_i5,
             file.
     :param unknown_i7: Dictionary with all unknown i7 barcodes from the fastq
             file.
-    :param output_file: Output file path.
+    :param output_file: File path to the output file.
     :param i5_i7_loc: Dictionary containing the i5 and i7 barcodes with their
             corresponding well locations. Dictionary has the structure:
             {i5: ["A" {i7: 1, i7: 2}]}.
@@ -155,33 +155,70 @@ def no_spike_output(i5_i7_combinations, unknown_barcodes, unknown_i5,
 def excel_writer(correct_i5_list, correct_i7_list, correct_spike_list,
                  well_locations, unknown_dict, combinations, output_file,
                  max_contamination, analyse_combination):
-    # Needed:
-    #   - Order spike-in sequences
-    #   - Known and unknown combinations
-    #   - Output file
-    # TODO: Docstrings and comments
-    if analyse_combination == 1:
-        # TODO: call functions for i5+i7 without spike filewriter
-        pass
-    elif analyse_combination == 2:
-        # i5+spike
+    """
+    Calls the function for the Excel output file writer.
+    :param correct_i5_list: List with all i5 barcodes from entered barcode
+            file.
+    :param correct_i7_list: List with all i7 barcodes from entered barcode
+            file.
+    :param correct_spike_list: List with all spike-in sequences from the
+            entered barcode file.
+    :param well_locations: List with all well locations of the different
+            barcode + spike-in sequence combinations.
+    :param unknown_dict: Dictionary containing all unknown barcodes and
+            spike-in sequences.
+    :param combinations: Dictionary containing every possible barcode +
+            spike-in sequence combination and the amount of occurrences.
+            Structure depends on analyse_combination parameter.
+    :param output_file: File path to the output file.
+    :param max_contamination: Parameter of the maximum allowed contamination.
+    :param analyse_combination: Parameter from settings.py.
+    """
+    # Checks which analyse parameter has been used
+    if analyse_combination == 2:
+        # Calls file_writer function for i5+spike-ins
         file_writer_bar_spike(correct_i5_list, correct_spike_list,
                               well_locations, combinations, output_file,
                               analyse_combination, unknown_dict)
+
     elif analyse_combination == 3:
-        # i7+spike
+        # Calls file_writer function for i7+spike-ins
         file_writer_bar_spike(correct_i7_list, correct_spike_list,
                               well_locations, combinations, output_file,
                               analyse_combination, unknown_dict)
+
+    # TODO: filewriter for i5+spike and i7+spike together
+    elif analyse_combination == 4:
+        # Calls file_writer function for i5+spike-ins and i7+spike-ins
+        pass
+
+    # TODO: i5+i7+spike file writer
     else:
-        # i5+i7+spike
+        # Calls file_writer function for i5+i7+spike-ins
         pass
 
 
 def file_writer_bar_spike(correct_bar_list, correct_spike_list,
                           well_locations, combinations, output_file,
                           analyse_combination, unknown_dict):
-    # TODO: Docstrings and comments
+    """
+    Writes the output of i5+spike or i7+spike to an Excel file.
+    :param correct_bar_list: List with all i5 or i7 barcodes from the entered
+            barcode file.
+    :param correct_spike_list: List with all spike-in sequences from the
+            entered barcode file.
+    :param well_locations: List with all well locations of the different
+            barcode + spike-in sequence combinations.
+    :param combinations: Dictionary containing every possible barcode +
+            spike-in sequence combination. Structure depends on spike-ins
+            parameter.
+    :param output_file: File path to the output file.
+    :param analyse_combination: Parameter from settings.py.
+    :param unknown_dict: Dictionary containing all unknown barcodes and
+            spike-in sequences.
+    :return: Excel output file at entered location.
+    """
+    # Checks if i5+spike or i7+spike has been selected
     if analyse_combination == 2:
         excel_2d_list = [["", "", "i5 barcodes →"], ["Well", "Spike-in"]]
         excel_tabname = "i5 + spike-in"
@@ -189,23 +226,33 @@ def file_writer_bar_spike(correct_bar_list, correct_spike_list,
         excel_2d_list = [["", "", "i7 barcodes →"], ["Well", "Spike-in"]]
         excel_tabname = "i7 + spike-in"
 
+    # Adds all well locations to the Excel 2d list
     for i in range(len(well_locations)):
         excel_2d_list.append([well_locations[i], i + 1])
 
+    # Creates an empty list
     added_barc = []
+
+    # Loops through the barcodes from the entered barcode file
     for i in range(len(correct_bar_list)):
-        if correct_bar_list[i] not in added_barc:
-            bar = correct_bar_list[i]
+
+        # Adds every barcode and spike-in sequence to the Excel 2d list
+        bar = correct_bar_list[i]
+        if bar not in added_barc:
             added_barc.append(bar)
             excel_2d_list[1].append(bar)
             for j in range(len(correct_spike_list)):
                 spike = correct_spike_list[j]
                 excel_2d_list[j + 2].append(combinations[bar][spike])
 
+    # Adds a total column and row
     excel_2d_list[1].append("Total")
     excel_2d_list.append(["", "Total"])
 
+    # Creates an empty list
     col_tot = []
+
+    # Adds the total values to the total column / row
     for row in range(2, len(excel_2d_list) - 1):
         excel_2d_list[row].append(sum(excel_2d_list[row][2:]))
         for value in range(2, len(excel_2d_list[row]) - 1):
@@ -214,16 +261,24 @@ def file_writer_bar_spike(correct_bar_list, correct_spike_list,
             else:
                 col_tot[value - 2] += excel_2d_list[row][value]
     excel_2d_list[-1].extend(col_tot)
+
+    # Creates the output file
     with xlsxwriter.Workbook(output_file) as workbook:
+
+        # Adds a new Excel tab
         contamination_table = workbook.add_worksheet(excel_tabname)
 
-        # Loops through the data and writes it to an Excel sheet with
-        # the correct cell format (bold / green background)
+        # Loops through the Excel 2d list and writes it to an Excel
+        # sheet with the correct cell format (bold / green background)
         for i in range(len(excel_2d_list)):
             for j in range(len(excel_2d_list[i])):
                 contamination_table.write(i, j, excel_2d_list[i][j])
 
+        # Checks if i5+spike has been selected
         if analyse_combination == 2:
+
+            # Creates unknown barcode and barcode+spike-in sequence
+            # Excel tabs
             unknown_bar = workbook.add_worksheet("unknown_i5")
             unknown_bar.write_row(0, 0, ["i5 barcode", "Occurrences"])
 
@@ -231,8 +286,14 @@ def file_writer_bar_spike(correct_bar_list, correct_spike_list,
             unknown_bar_spike.write_row(0, 0, ["i5 barcode",
                                                "Spike-in sequence",
                                                "Occurrences"])
+            # Saves the barcode type to a variable
             barcode = "i5"
+
+        # i7+spike has been selected
         else:
+
+            # Creates unknown barcode and barcode+spike-in sequence
+            # Excel tabs
             unknown_bar = workbook.add_worksheet("unknown_i7")
             unknown_bar.write_row(0, 0, ["i7 barcode", "Occurrences"])
 
@@ -240,16 +301,22 @@ def file_writer_bar_spike(correct_bar_list, correct_spike_list,
             unknown_bar_spike.write_row(0, 0, ["i7 barcode",
                                                "Spike-in sequence",
                                                "Occurrences"])
+            # Saves the barcode type to a variable
             barcode = "i7"
 
+        # Creates unknown spike-in sequence Excel tab
         unknown_spike = workbook.add_worksheet("unknown_spike")
 
+        # Writes the unknown barcodes and the amount of occurrences to
+        # the Excel file
         row = 1
         for bar in unknown_dict[barcode]:
             unknown_bar.write_row(row, 0, [bar,
                                            unknown_dict[barcode][bar]])
             row += 1
 
+        # Writes the unknown spike-in sequences and the amount of
+        # occurrences to the Excel file
         row = 1
         unknown_spike.write_row(0, 0, ["Spike-in sequence", "Occurrences"])
         for spike in unknown_dict["spike"]:
@@ -257,6 +324,8 @@ def file_writer_bar_spike(correct_bar_list, correct_spike_list,
                                              unknown_dict["spike"][spike]])
             row += 1
 
+        # Writes the unknown barcode+spike-in sequences and the amount of
+        # occurrences to the Excel file
         row = 1
         for bar in unknown_dict[barcode + "_spike"]:
             for spike in unknown_dict[barcode + "_spike"][bar]:

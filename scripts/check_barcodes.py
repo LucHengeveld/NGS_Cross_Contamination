@@ -147,7 +147,7 @@ def barc_with_spike(combinations, correct_spike_list, correct_i5_list,
             spike-in sequences.
     :return combinations: Dictionary containing every possible barcode +
             spike-in sequence combination and the amount of occurrences.
-            Structure depends on spike-ins parameter.
+            Structure depends on analyse_combination parameter.
     """
     # List of all possible unknown barcode / spike-in sequence
     # combinations
@@ -215,6 +215,10 @@ def barc_with_spike(combinations, correct_spike_list, correct_i5_list,
                     barcode, bar_type, combinations, spike_seq, unknown_dict,
                     correct_bar_list, correct_spike_list, diff_bar_nucl,
                     diff_seq_nucl)
+
+        elif analyse_combination == 4:
+            # TODO: i5+spike and i7+spike together
+            pass
 
         # Calls the i5+i7+spike-ins functions
         else:
@@ -311,6 +315,8 @@ def retrieve_combinations_with_spike(barcode_file_dict, analyse_combination):
             file.
     :return correct_i7_list: List with all i7 barcodes from the entered barcode
             file.
+    :return well_locations: List with all well locations of the different
+            barcode + spike-in sequence combinations.
     """
     # Creates empty lists
     correct_i5_list = []
@@ -348,6 +354,10 @@ def retrieve_combinations_with_spike(barcode_file_dict, analyse_combination):
                 else:
                     combinations[barcode][spike_seq] = 0
 
+    elif analyse_combination == 4:
+        # TODO: i5+spike and i7+spike together
+        pass
+
     else:
         # Saves the i5 / i7 / spike-in sequence combinations to a
         # dictionary
@@ -362,7 +372,8 @@ def retrieve_combinations_with_spike(barcode_file_dict, analyse_combination):
 
     # Returns the combinations dict and correct i5, i7 and spike
     # sequence lists
-    return combinations, correct_spike_list, correct_i5_list, correct_i7_list, well_locations
+    return combinations, correct_spike_list, correct_i5_list, correct_i7_list, \
+           well_locations
 
 
 def retrieve_barcode_location(barcode_file_data):

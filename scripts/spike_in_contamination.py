@@ -1,9 +1,6 @@
 from Levenshtein import distance
 
 
-# TODO: Rewrite / improve all functions by creating 3 functions: i5/i7/spike
-#  with param seq/bar diff and return booleans (if using diff param also return
-#  correct barcodes/sequences).
 def bar_spike(barcode, bar_type, combinations, spike_seq, unknown_dict,
               correct_bar_list, correct_spike_list):
     """
@@ -151,12 +148,13 @@ def bar_spike_seq_diff(barcode, bar_type, combinations, spike_seq,
     if barcode in correct_bar_list:
         unknown_dict, combinations, found_spike = check_spike_in(
             correct_spike_list, spike_seq, diff_seq_nucl, combinations,
-            barcode, unknown_dict, found_spike, True, bar_type)
+            barcode, unknown_dict, found_spike, bar_type, True)
     else:
         # Checks if spike-in sequence is in the entered barcode file
         unknown_dict, combinations, found_spike = check_spike_in(
             correct_spike_list, spike_seq, diff_seq_nucl, combinations,
-            barcode, unknown_dict, found_spike, False, bar_type)
+            barcode, unknown_dict, found_spike, bar_type, False)
+
         if not found_spike:
             # Barcode and spike-in sequence are unknown
             unknown_dict = unknown_bar_spike(barcode, unknown_dict, bar_type,
@@ -205,41 +203,63 @@ def bar_spike_bar_seq_diff(barcode, bar_type, combinations, spike_seq,
             found_barc = True
             unknown_dict, combinations, found_spike = check_spike_in(
                 correct_spike_list, spike_seq, diff_seq_nucl, combinations,
-                barcode, unknown_dict, found_spike, found_barc, bar_type)
+                barcode, unknown_dict, found_spike, bar_type, found_barc)
             break
     if not found_barc:
         # Checks if spike-in sequence is in the entered barcode file
         unknown_dict, combinations, found_spike = check_spike_in(
             correct_spike_list, spike_seq, diff_seq_nucl, combinations,
-            barcode, unknown_dict, found_spike, found_barc, bar_type)
+            barcode, unknown_dict, found_spike, bar_type, found_barc)
 
     # Returns the dictionary with the known barcodes, unknown barcodes,
     # spike-in sequences and their amount of occurrences
     return unknown_dict, combinations
 
 
-# TODO: Docstrings / comments in every i5_i7_spike function
 def i5_i7_spike(barcode, combinations, spike_seq, unknown_dict,
                 correct_i5_list, correct_i7_list, correct_spike_list):
-
+    """
+    Compares the i5, i7 and spike-in sequences from the fastq file to the ones
+    from the entered barcode and spike-in sequence file.
+    :param barcode: List with the i5 and i7 barcodes.
+    :param combinations: Dictionary containing every possible barcode +
+            spike-in sequence combination and the amount of occurrences.
+            Structure depends on analyse_combination parameter.
+    :param spike_seq: Spike-in sequence from fastq read.
+    :param unknown_dict: Dictionary containing all unknown barcodes and
+            spike-in sequences.
+    :param correct_i5_list: List with all i5 barcodes from the entered barcode
+            file.
+    :param correct_i7_list: List with all i7 barcodes from the entered barcode
+            file.
+    :param correct_spike_list: List with all spike-in sequences from the
+            entered barcode file.
+    :return unknown_dict: Dictionary containing all unknown barcodes and
+            spike-in sequences and the amount of occurrences.
+    :return combinations: Dictionary containing every possible barcode +
+            spike-in sequence combination and the amount of occurrences.
+            Structure depends on analyse_combination parameter.
+    """
+    # Saves the i5 and i7 barcodes as a variable
     i5 = barcode[0]
     i7 = barcode[1]
 
+    # Checks if i5, i7 and spike-in sequence is correct
     if i5 in correct_i5_list:
         if i7 in correct_i7_list:
             if spike_seq in correct_spike_list:
-                # i5, i7 and spike-in sequence known
+                # i5, i7 and spike-in sequence correct
                 combinations[i5 + "+" + i7][spike_seq] += 1
 
             else:
-                # Spike-in sequence unknown
+                # Spike-in sequence is unknown
                 if spike_seq not in unknown_dict["spike"]:
                     unknown_dict["spike"].update({spike_seq: 1})
                 else:
                     unknown_dict["spike"][spike_seq] += 1
 
         elif spike_seq in correct_spike_list:
-            # i7 unknown
+            # i7 is unknown
             if i7 not in unknown_dict["i7"]:
                 unknown_dict["i7"].update({i7: 1})
             else:
@@ -251,7 +271,7 @@ def i5_i7_spike(barcode, combinations, spike_seq, unknown_dict,
 
     elif i7 in correct_i7_list:
         if spike_seq in correct_spike_list:
-            # i5 unknown
+            # i5 is unknown
             if i5 not in unknown_dict["i5"]:
                 unknown_dict["i5"].update({i5: 1})
             else:
@@ -261,7 +281,7 @@ def i5_i7_spike(barcode, combinations, spike_seq, unknown_dict,
             unknown_dict = unknown_bar_spike(i5, unknown_dict, "i5", spike_seq)
 
     elif spike_seq in correct_spike_list:
-        # i5 and i7 unknown
+        # i5 and i7 are unknown
         if i5 not in unknown_dict["i5_i7"]:
             unknown_dict["i5_i7"].update({i5: {i7: 1}})
         elif i7 not in unknown_dict["i5_i7"][i5]:
@@ -270,7 +290,7 @@ def i5_i7_spike(barcode, combinations, spike_seq, unknown_dict,
             unknown_dict["i5_i7"][i5][i7] += 1
 
     else:
-        # i5, i7 and spike-in sequence unknown
+        # i5, i7 and spike-in sequence are unknown
         if i5 not in unknown_dict["i5_i7_spike"]:
             unknown_dict["i5_i7_spike"].update({i5: {i7: {spike_seq: 1}}})
         elif i7 not in unknown_dict["i5_i7_spike"][i5]:
@@ -280,9 +300,11 @@ def i5_i7_spike(barcode, combinations, spike_seq, unknown_dict,
         else:
             unknown_dict["i5_i7"][i5][i7][spike_seq] += 1
 
+    # Returns the updated unknown_dict and combinations dictionary
     return unknown_dict, combinations
 
 
+# TODO: Docstrings / comments in every i5_i7_spike function
 def i5_i7_spike_bar_diff(barcode, combinations, spike_seq, unknown_dict,
                          correct_i5_list, correct_spike_list, diff_bar_nucl):
     # Both i5 and i7 are allowed to differ x amount of nucleotides, not
@@ -324,7 +346,6 @@ def unknown_bar_spike(barcode, unknown_dict, bar_type, spike_seq):
     return unknown_dict
 
 
-# TODO: Docstrings and comments:
 def check_spike_in(correct_spike_list, spike_seq, diff_seq_nucl, combinations,
                    barcode, unknown_dict, found_spike, bar_type, found_barc):
     """
@@ -357,18 +378,31 @@ def check_spike_in(correct_spike_list, spike_seq, diff_seq_nucl, combinations,
         # file
         if distance(spike_seq, correct_spike) <= diff_seq_nucl:
             found_spike = True
-            # Barcode and spike-in sequence known
-            combinations[barcode][spike_seq] += 1
+            spike_sequence = correct_spike
             break
 
-    if found_barc and not found_spike:
-        # Spike-in sequence unknown
-        if spike_seq not in unknown_dict["spike"]:
-            unknown_dict["spike"].update({spike_seq: 1})
+    if found_barc:
+        if found_spike:
+            # Barcode and spike-in sequence known
+            combinations[barcode][spike_sequence] += 1
         else:
-            unknown_dict["spike"][spike_seq] += 1
-    if not found_barc and not found_spike:
+            # Spike-in sequence unknown
+            if spike_seq not in unknown_dict["spike"]:
+                unknown_dict["spike"].update({spike_seq: 1})
+            else:
+                unknown_dict["spike"][spike_seq] += 1
+
+    elif found_spike:
+        # Barcode unknown
+        if barcode not in unknown_dict[bar_type]:
+            unknown_dict[bar_type].update({barcode: 1})
+        else:
+            unknown_dict[bar_type][barcode] += 1
+
+    else:
         # Barcode and spike-in sequence are unknown
         unknown_dict = unknown_bar_spike(barcode, unknown_dict, bar_type,
                                          spike_seq)
+
+    # Returns the updated dictionary
     return unknown_dict, combinations, found_spike

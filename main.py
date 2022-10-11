@@ -45,7 +45,7 @@ if __name__ == "__main__":
                              correct_i5_list, correct_i7_list,
                              i5_i7_combinations)
 
-        if settings.INDEXING == "1":
+        if settings.INDEXING == 1:
             # Retrieve barcode well locations
             print("Retrieve well locations", time.strftime("%H:%M"))
             i5_i7_loc = cb.retrieve_barcode_location(barcode_file_data)
@@ -77,8 +77,8 @@ if __name__ == "__main__":
         print("Create dict of all possible combinations",
               time.strftime("%H:%M"))
         combinations, correct_spike_list, correct_i5_list, correct_i7_list, \
-            well_locations = cb.retrieve_combinations_with_spike(
-                barcode_file_data, settings.ANALYSE_COMBINATION)
+        well_locations = cb.retrieve_combinations_with_spike(
+            barcode_file_data, settings.ANALYSE_COMBINATION)
 
         # Compare all fastq barcodes to the ones found in the barcode +
         # spike-in file
@@ -94,11 +94,12 @@ if __name__ == "__main__":
         # Checks if you would like to analyse i5+spike or i7+spike
         if settings.ANALYSE_COMBINATION in [2, 3]:
             # Write data to output Excel file
-            fw.excel_writer(correct_i5_list, correct_i7_list, correct_spike_list,
+            fw.excel_writer(correct_i5_list, correct_i7_list,
+                            correct_spike_list,
                             well_locations, unknown_dict, combinations,
                             output_file, settings.MAX_CONTAMINATION,
                             settings.ANALYSE_COMBINATION)
-
+            # TODO: i5+spike and i7+spike together
         else:
             if settings.INDEXING == 1:
                 # combinatorial spike-ins i5+i7
@@ -106,20 +107,6 @@ if __name__ == "__main__":
             else:
                 # unique i5+i7 spike-ins
                 pass
-
-        # Unfinished spike-ins code:
-        # Spike in sequences:
-        # # Checks which sequences are contaminated
-        # contaminated_sequences = cc.check_seq_combinatorial(fastq_dict,
-        #                                                     bar_seq_dict,
-        #                                                     parameters_list[5])
-        #
-        # if contaminated_sequences:
-        #     # print(len(contaminated_sequences), "contaminated sequences found.")
-        #     cc.contaminated_origin(bar_seq_dict, contaminated_sequences)
-        # else:
-        #     # print("No contaminated sequences found.")
-        #     pass
 
 print("Code finished\nScript duration:", round(time.time() - start_time),
       "seconds")
