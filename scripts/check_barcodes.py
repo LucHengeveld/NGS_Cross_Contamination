@@ -9,7 +9,7 @@ def barc_no_spike(fastq_data, diff_bar_nucl, correct_i5_list,
     """
     Checks and counts the different possible i5 + i7 combinations.
     :param fastq_data: List with the structure [barcode 1, barcode2, etc].
-    :param diff_bar_nucl: Parameter from parameters.txt.
+    :param diff_bar_nucl: Parameter from settings.py.
     :param correct_i5_list: List with all i5 barcodes from entered barcode
             file.
     :param correct_i7_list: List with all i7 barcodes from entered barcode
@@ -140,9 +140,9 @@ def barc_with_spike(combinations, correct_spike_list, correct_i5_list,
             file.
     :param fastq_data: List with the structure [[i5, i7, sequence],[i5, i7,
             sequence], etc].
-    :param diff_bar_nucl: Parameter from parameters.txt.
-    :param diff_seq_nucl: Parameter from parameters.txt.
-    :param analyse_combination: Parameter from parameters.txt.
+    :param diff_bar_nucl: Parameter from settings.py.
+    :param diff_seq_nucl: Parameter from settings.py.
+    :param analyse_combination: Parameter from settings.py.
     :return unknown_dict: Dictionary containing all unknown barcodes and
             spike-in sequences.
     :return combinations: Dictionary containing every possible barcode +
@@ -301,7 +301,7 @@ def retrieve_combinations_with_spike(barcode_file_dict, analyse_combination):
     """
     Creates a dictionary with all possible barcode combinations.
     :param barcode_file_dict: List with all barcodes from the Excel file.
-    :param analyse_combination: Parameter from parameters.txt.
+    :param analyse_combination: Parameter from settings.py.
     :return combinations: Dictionary containing every possible barcode +
             spike-in sequence combination. Structure depends on spike-ins
             parameter.

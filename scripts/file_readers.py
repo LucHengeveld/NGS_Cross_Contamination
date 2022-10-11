@@ -34,8 +34,8 @@ def barcode_file_reader(barcode_file, sequencing_method, analyse_combination):
     Retrieves the barcodes (and spike in sequences if spike_in parameter is
     '2') from the entered Excel file.
     :param barcode_file: Path to the Excel file.
-    :param sequencing_method: Parameter from parameters.txt.
-    :param analyse_combination: Parameter from parameters.txt.
+    :param sequencing_method: Parameter from settings.py.
+    :param analyse_combination: Parameter from settings.py.
     :return barcode_file_list: List with all barcodes from the Excel file.
     :return barcode_file_dict: Dictionary with structure {barcode: [well, spike
             seq, 0]}.

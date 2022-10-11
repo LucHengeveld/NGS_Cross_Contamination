@@ -1,6 +1,6 @@
 # Imports the other python scripts
-from scripts import file_readers as fr, parameters as pm, check_barcodes as cb, \
-    file_writers as fw
+from scripts import file_readers as fr, parameters as pm, check_barcodes as \
+    cb, file_writers as fw
 
 import time
 
@@ -8,7 +8,6 @@ start_time = time.time()
 
 if __name__ == "__main__":
     # TODO: Docstrings / comments.
-    # TODO: Update old parameter.txt docstrings in all functions
     # Main function of the script, calls the different functions
 
     # Checks if the parameters have been entered correctly by the user

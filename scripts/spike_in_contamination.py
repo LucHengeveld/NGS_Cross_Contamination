@@ -75,7 +75,7 @@ def bar_spike_bar_diff(barcode, bar_type, combinations, spike_seq,
             file.
     :param correct_spike_list: List with all spike-in sequences from the
             entered barcode file.
-    :param diff_bar_nucl: Parameter from parameters.txt.
+    :param diff_bar_nucl: Parameter from settings.py.
     :return unknown_dict: Dictionary containing all unknowns barcodes and
             spike-in sequences.
     :return combinations: Dictionary containing every possible barcode +
@@ -137,7 +137,7 @@ def bar_spike_seq_diff(barcode, bar_type, combinations, spike_seq,
             file.
     :param correct_spike_list: List with all spike-in sequences from the
             entered barcode file.
-    :param diff_seq_nucl: Parameter from parameters.txt.
+    :param diff_seq_nucl: Parameter from settings.py.
     :return unknown_dict: Dictionary containing all unknowns barcodes and
             spike-in sequences.
     :return combinations: Dictionary containing every possible barcode +
@@ -186,8 +186,8 @@ def bar_spike_bar_seq_diff(barcode, bar_type, combinations, spike_seq,
             file.
     :param correct_spike_list: List with all spike-in sequences from the
             entered barcode file.
-    :param diff_bar_nucl: Parameter from parameters.txt.
-    :param diff_seq_nucl: Parameter from parameters.txt.
+    :param diff_bar_nucl: Parameter from settings.py.
+    :param diff_seq_nucl: Parameter from settings.py.
     :return unknown_dict: Dictionary containing all unknowns barcodes and
             spike-in sequences.
     :return combinations: Dictionary containing every possible barcode +
@@ -332,7 +332,7 @@ def check_spike_in(correct_spike_list, spike_seq, diff_seq_nucl, combinations,
     :param correct_spike_list: List with all spike-in sequences from the
             entered barcode file.
     :param spike_seq: Spike-in sequence.
-    :param diff_seq_nucl: Parameter from parameters.txt.
+    :param diff_seq_nucl: Parameter from settings.py.
     :param combinations: Dictionary containing every possible barcode +
             spike-in sequence combination and the amount of occurrences.
             Structure depends on spike-ins parameter.
