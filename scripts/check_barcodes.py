@@ -168,57 +168,41 @@ def barc_with_spike(combinations, correct_spike_list, correct_i5_list,
 
         # Checks if spike-ins parameter has value 2 (i5+spike) or 3
         # (i7+spike)
-        if analyse_combination in [2, 3]:
+        if analyse_combination in [2, 3, 4]:
             if analyse_combination == 2:
                 # Saves the i5 barcode and correct barcode list to a
-                # variable
+                # variable and passes the variables to a function
                 barcode = read[0]
                 bar_type = "i5"
                 correct_bar_list = correct_i5_list
+                unknown_dict, combinations = bar_spike_function_caller(
+                    combinations, correct_spike_list, diff_bar_nucl,
+                    diff_seq_nucl, barcode, bar_type, correct_bar_list,
+                    unknown_dict, spike_seq)
 
-            else:
+            elif analyse_combination == 3:
                 # Saves the i7 barcode and correct barcode list to a
-                # variable
+                # variable and passes the variables to a function
                 barcode = read[1]
                 bar_type = "i7"
                 correct_bar_list = correct_i7_list
-
-            # Checks if barcode nucleotides are allowed to differ
-            if diff_bar_nucl == 0:
-
-                # Calls correct functions depending on diff_bar_nucl and
-                # diff_seq_nucl parameters
-                if diff_seq_nucl == 0:
-                    # Bar diff = 0 and seq diff = 0
-                    unknown_dict, combinations = sic.bar_spike(
-                        barcode, bar_type, combinations, spike_seq,
-                        unknown_dict, correct_bar_list, correct_spike_list)
-                else:
-                    # Bar diff = 0 and seq diff != 0
-                    unknown_dict, combinations = sic.bar_spike_seq_diff(
-                        barcode, bar_type, combinations, spike_seq,
-                        unknown_dict, correct_bar_list, correct_spike_list,
-                        diff_seq_nucl)
-
-            # Calls correct functions depending on diff_bar_nucl and
-            # diff_seq_nucl parameters
-            elif diff_seq_nucl == 0:
-
-                # Bar diff != 0 and seq diff = 0
-                unknown_dict, combinations = sic.bar_spike_bar_diff(
-                    barcode, bar_type, combinations, spike_seq, unknown_dict,
-                    correct_bar_list, correct_spike_list, diff_bar_nucl)
+                unknown_dict, combinations = bar_spike_function_caller(
+                    combinations, correct_spike_list, diff_bar_nucl,
+                    diff_seq_nucl, barcode, bar_type, correct_bar_list,
+                    unknown_dict, spike_seq)
 
             else:
-                # Bar diff != 0 and seq diff != 0
-                unknown_dict, combinations = sic.bar_spike_bar_seq_diff(
-                    barcode, bar_type, combinations, spike_seq, unknown_dict,
-                    correct_bar_list, correct_spike_list, diff_bar_nucl,
-                    diff_seq_nucl)
-
-        elif analyse_combination == 4:
-            # TODO: i5+spike and i7+spike together
-            pass
+                # Saves the i5 barcode and correct barcode list to a
+                # variable and passes the variables to a function
+                # TODO: Fix double counted unknown spike sequences
+                barcode = read[:2]
+                bar_type = ["i5", "i7"]
+                correct_bar_list = [correct_i5_list, correct_i7_list]
+                for i in range(len(barcode)):
+                    unknown_dict, combinations = bar_spike_function_caller(
+                        combinations, correct_spike_list, diff_bar_nucl,
+                        diff_seq_nucl, barcode[i], bar_type[i],
+                        correct_bar_list[i], unknown_dict, spike_seq)
 
         # Calls the i5+i7+spike-ins functions
         else:
@@ -261,6 +245,46 @@ def barc_with_spike(combinations, correct_spike_list, correct_i5_list,
     # Returns a dictionary containing all unknown i5/i7/spike-in
     # combinations and a dictionary containing all known combinations
     # and their occurrence
+    return unknown_dict, combinations
+
+
+def bar_spike_function_caller(combinations, correct_spike_list, diff_bar_nucl,
+                              diff_seq_nucl, barcode, bar_type,
+                              correct_bar_list, unknown_dict, spike_seq):
+    # TODO: Docstrings
+    # Checks if barcode nucleotides are allowed to differ
+    if diff_bar_nucl == 0:
+
+        # Calls correct functions depending on diff_bar_nucl and
+        # diff_seq_nucl parameters
+        if diff_seq_nucl == 0:
+            # Bar diff = 0 and seq diff = 0
+            unknown_dict, combinations = sic.bar_spike(
+                barcode, bar_type, combinations, spike_seq,
+                unknown_dict, correct_bar_list, correct_spike_list)
+        else:
+            # Bar diff = 0 and seq diff != 0
+            unknown_dict, combinations = sic.bar_spike_seq_diff(
+                barcode, bar_type, combinations, spike_seq,
+                unknown_dict, correct_bar_list, correct_spike_list,
+                diff_seq_nucl)
+
+    # Calls correct functions depending on diff_bar_nucl and
+    # diff_seq_nucl parameters
+    elif diff_seq_nucl == 0:
+
+        # Bar diff != 0 and seq diff = 0
+        unknown_dict, combinations = sic.bar_spike_bar_diff(
+            barcode, bar_type, combinations, spike_seq, unknown_dict,
+            correct_bar_list, correct_spike_list, diff_bar_nucl)
+
+    else:
+        # Bar diff != 0 and seq diff != 0
+        unknown_dict, combinations = sic.bar_spike_bar_seq_diff(
+            barcode, bar_type, combinations, spike_seq, unknown_dict,
+            correct_bar_list, correct_spike_list, diff_bar_nucl,
+            diff_seq_nucl)
+
     return unknown_dict, combinations
 
 
@@ -337,7 +361,7 @@ def retrieve_combinations_with_spike(barcode_file_dict, analyse_combination):
 
     # Creates a dictionary with every possible combination and set the
     # amount of occurrences to 0
-    if analyse_combination in [2, 3]:
+    if analyse_combination in [2, 3, 4]:
 
         # Use correct list depending on spike_ins parameter
         if analyse_combination == 2:
@@ -345,19 +369,26 @@ def retrieve_combinations_with_spike(barcode_file_dict, analyse_combination):
         else:
             correct_barcode_list = correct_i7_list
 
-        # Saves the i5 + spike-in or i7 + spike-in combinations to a
-        # dictionary
-        for barcode in correct_barcode_list:
-            for spike_seq in correct_spike_list:
-                if barcode not in combinations:
-                    combinations[barcode] = {spike_seq: 0}
-                else:
-                    combinations[barcode][spike_seq] = 0
-
-    elif analyse_combination == 4:
-        # TODO: i5+spike and i7+spike together
-        pass
-
+        if analyse_combination in [2, 3]:
+            # Saves the i5 + spike-in or i7 + spike-in combinations to a
+            # dictionary
+            for barcode in correct_barcode_list:
+                for spike_seq in correct_spike_list:
+                    if barcode not in combinations:
+                        combinations[barcode] = {spike_seq: 0}
+                    else:
+                        combinations[barcode][spike_seq] = 0
+        else:
+            i5_i7_barcode_lists = [correct_i5_list, correct_i7_list]
+            for correct_barcode_list in i5_i7_barcode_lists:
+                # Saves the i5 + spike-in and i7 + spike-in combinations to a
+                # dictionary
+                for barcode in correct_barcode_list:
+                    for spike_seq in correct_spike_list:
+                        if barcode not in combinations:
+                            combinations[barcode] = {spike_seq: 0}
+                        else:
+                            combinations[barcode][spike_seq] = 0
     else:
         # Saves the i5 / i7 / spike-in sequence combinations to a
         # dictionary
@@ -372,8 +403,7 @@ def retrieve_combinations_with_spike(barcode_file_dict, analyse_combination):
 
     # Returns the combinations dict and correct i5, i7 and spike
     # sequence lists
-    return combinations, correct_spike_list, correct_i5_list, correct_i7_list, \
-           well_locations
+    return combinations, correct_spike_list, correct_i5_list, correct_i7_list, well_locations
 
 
 def retrieve_barcode_location(barcode_file_data):

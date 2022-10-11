@@ -77,14 +77,13 @@ if __name__ == "__main__":
         print("Create dict of all possible combinations",
               time.strftime("%H:%M"))
         combinations, correct_spike_list, correct_i5_list, correct_i7_list, \
-        well_locations = cb.retrieve_combinations_with_spike(
-            barcode_file_data, settings.ANALYSE_COMBINATION)
+            well_locations = cb.retrieve_combinations_with_spike(
+                barcode_file_data, settings.ANALYSE_COMBINATION)
 
         # Compare all fastq barcodes to the ones found in the barcode +
         # spike-in file
         print("Compare barcodes and sequences from fastq file",
               time.strftime("%H:%M"))
-        # TODO: i5+i7+spike
         unknown_dict, combinations = cb.barc_with_spike(
             combinations, correct_spike_list, correct_i5_list, correct_i7_list,
             fastq_data, settings.BARC_DIFF, settings.SPIKE_DIFF,
@@ -92,14 +91,13 @@ if __name__ == "__main__":
 
         print("Write data to output Excel file", time.strftime("%H:%M"))
         # Checks if you would like to analyse i5+spike or i7+spike
-        if settings.ANALYSE_COMBINATION in [2, 3]:
+        if settings.ANALYSE_COMBINATION in [2, 3, 4]:
             # Write data to output Excel file
             fw.excel_writer(correct_i5_list, correct_i7_list,
                             correct_spike_list,
                             well_locations, unknown_dict, combinations,
                             output_file, settings.MAX_CONTAMINATION,
                             settings.ANALYSE_COMBINATION)
-            # TODO: i5+spike and i7+spike together
         else:
             if settings.INDEXING == 1:
                 # combinatorial spike-ins i5+i7
@@ -108,5 +106,6 @@ if __name__ == "__main__":
                 # unique i5+i7 spike-ins
                 pass
 
-print("Code finished\nScript duration:", round(time.time() - start_time),
+print("--- Code finished ---\nScript duration:",
+      round(time.time() - start_time),
       "seconds")
