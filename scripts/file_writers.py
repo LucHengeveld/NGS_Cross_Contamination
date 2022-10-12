@@ -1,3 +1,4 @@
+# Imports the required modules
 import xlsxwriter
 
 
@@ -220,6 +221,7 @@ def file_writer_bar_spike(correct_bar_list, correct_spike_list,
             spike-in sequences.
     :return: Excel output file at entered location.
     """
+    # TODO: Add heatmap
     # Checks if i5+spike or i7+spike has been selected
     if analyse_combination == 2:
         excel_2d_list = [["", "", "i5 barcodes →"], ["Well", "Spike-in"]]
@@ -352,7 +354,7 @@ def i5_spike_i7_spike(correct_bar_list, correct_spike_list,
             spike-in sequences.
     :return: Excel output file at entered location.
     """
-
+    # TODO: Add heatmap
     excel_2d_lists = [[["", "", "i5 barcodes →"], ["Well", "Spike-in"]],
                       [["", "", "i7 barcodes →"], ["Well", "Spike-in"]]]
     excel_tabnames = ["i5 + spike-in", "i7 + spike-in"]

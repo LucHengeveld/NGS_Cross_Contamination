@@ -2,6 +2,7 @@
 from scripts import file_readers as fr, parameters as pm, check_barcodes as \
     cb, file_writers as fw
 
+# Imports the required modules
 import time
 
 start_time = time.time()

@@ -1,5 +1,7 @@
+# Imports the other python scripts
 from scripts import spike_in_contamination as sic
 
+# Imports the required modules
 from Levenshtein import distance
 import re
 

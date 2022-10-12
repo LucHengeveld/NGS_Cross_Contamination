@@ -1,10 +1,15 @@
+# Imports the required modules
 import os
 from python_settings import settings
 
 
 def check_parameters():
-    # TODO: Add docstrings to this function.
-    # TODO: Fix error codes
+    """
+    Retrieves the parameters from the settings.py file and checks if they have
+    been entered correctly.
+    :return settings: Class containing the values of all parameters.
+    """
+    # TODO: Fix error code numbers
 
     # Retrieves the parameters from the setting file
     os.environ["SETTINGS_MODULE"] = 'settings'
