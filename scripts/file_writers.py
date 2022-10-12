@@ -174,6 +174,7 @@ def excel_writer(correct_i5_list, correct_i7_list, correct_spike_list,
     :param max_contamination: Parameter of the maximum allowed contamination.
     :param analyse_combination: Parameter from settings.py.
     """
+    # TODO: Add heatmap to spike-in results
     # Checks which analyse parameter has been used
     if analyse_combination == 2:
         # Calls file_writer function for i5+spike-ins
@@ -187,7 +188,6 @@ def excel_writer(correct_i5_list, correct_i7_list, correct_spike_list,
                               well_locations, combinations, output_file,
                               analyse_combination, unknown_dict)
 
-    # TODO: filewriter for i5+spike and i7+spike together
     elif analyse_combination == 4:
         # Calls file_writer function for i5+spike-ins and i7+spike-ins
         i5_spike_i7_spike([correct_i5_list, correct_i7_list],
@@ -308,19 +308,24 @@ def file_writer_bar_spike(correct_bar_list, correct_spike_list,
         unknown_spike = workbook.add_worksheet("unknown_spike")
         unknown_spike.write_row(0, 0, ["Spike-in sequence", "Occurrences"])
 
-        # TODO: Comments
+        # Writes the unknown barcodes and their occurrences to an Excel
+        # tab
         row = 1
         for bar in unknown_dict[barcode]:
             unknown_bar.write_row(row, 0, [bar,
                                            unknown_dict[barcode][bar]])
             row += 1
 
+        # Writes the unknown spike-ins and their occurrences to an Excel
+        # tab
         row = 1
         for spike in unknown_dict["spike"]:
             unknown_spike.write_row(row, 0, [spike,
                                              unknown_dict["spike"][spike]])
             row += 1
 
+        # Writes the unknown barcodes+spike-ins and their occurrences to
+        # an Excel tab
         row = 1
         for bar in unknown_dict[barcode + "_spike"]:
             for spike in unknown_dict[barcode + "_spike"][bar]:
@@ -421,7 +426,8 @@ def i5_spike_i7_spike(correct_bar_list, correct_spike_list,
         unknown_spike = workbook.add_worksheet("unknown_spike")
         unknown_spike.write_row(0, 0, ["Spike-in sequence", "Occurrences"])
 
-        # TODO: Comments
+        # Writes the unknown barcodes and their occurrences to an Excel
+        # tab
         barcodes = ["i5", "i7"]
         for tab in range(len(unknown_bar)):
             row = 1
@@ -430,12 +436,16 @@ def i5_spike_i7_spike(correct_bar_list, correct_spike_list,
                     row, 0, [bar, unknown_dict[barcodes[tab]][bar]])
                 row += 1
 
+            # Writes the unknown barcodes+spike-ins and their occurrences to
+            # an Excel tab
             row = 1
             for bar in unknown_dict[barcodes[tab] + "_spike"]:
                 for spike in unknown_dict[barcodes[tab] + "_spike"][bar]:
                     unknown_bar_spike[tab].write_row(row, 0, [bar, spike, unknown_dict[barcodes[tab] + "_spike"][bar][spike]])
                 row += 1
 
+        # Writes the unknown spike-ins and their occurrences to an Excel
+        # tab
         row = 1
         for spike in unknown_dict["spike"]:
             unknown_spike.write_row(row, 0, [spike, unknown_dict["spike"][spike]])

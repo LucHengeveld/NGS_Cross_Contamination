@@ -192,7 +192,7 @@ def barc_with_spike(combinations, correct_spike_list, correct_i5_list,
                     unknown_dict, spike_seq)
 
             else:
-                # Saves the i5 barcode and correct barcode list to a
+                # Saves the barcodes and correct barcode lists to a
                 # variable and passes the variables to a function
                 # TODO: Fix double counted unknown spike sequences
                 barcode = read[:2]
@@ -251,7 +251,28 @@ def barc_with_spike(combinations, correct_spike_list, correct_i5_list,
 def bar_spike_function_caller(combinations, correct_spike_list, diff_bar_nucl,
                               diff_seq_nucl, barcode, bar_type,
                               correct_bar_list, unknown_dict, spike_seq):
-    # TODO: Docstrings
+    """
+
+    :param combinations: Dictionary containing every possible barcode +
+            spike-in sequence combination. Structure depends on spike-ins
+            parameter.
+    :param correct_spike_list: List with all spike-in sequences from the
+            entered barcode file.
+    :param diff_bar_nucl: Parameter from settings.py.
+    :param diff_seq_nucl: Parameter from settings.py.
+    :param barcode: i5 or i7 barcode from a fastq file read.
+    :param bar_type: The type of the barcode (i5 or i7).
+    :param correct_bar_list: List with all i5 or i7 barcodes from the entered
+            barcode file.
+    :param unknown_dict: Dictionary containing all unknown barcodes and
+            spike-in sequences.
+    :param spike_seq: Spike-in sequence from a fastq file read.
+    :return unknown_dict: Dictionary containing all unknown barcodes and
+            spike-in sequences.
+    :return combinations: Dictionary containing every possible barcode +
+            spike-in sequence combination. Structure depends on spike-ins
+            parameter.
+    """
     # Checks if barcode nucleotides are allowed to differ
     if diff_bar_nucl == 0:
 
