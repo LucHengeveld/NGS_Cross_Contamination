@@ -7,7 +7,7 @@ import re
 def barc_no_spike(fastq_data, diff_bar_nucl, correct_i5_list,
                   correct_i7_list, i5_i7_combinations):
     """
-    Checks and counts the different possible i5 + i7 combinations.
+    Compares all fastq barcodes to the barcode file.
     :param fastq_data: List with the structure [barcode 1, barcode2, etc].
     :param diff_bar_nucl: Parameter from settings.py.
     :param correct_i5_list: List with all i5 barcodes from entered barcode
