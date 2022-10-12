@@ -1,11 +1,6 @@
 import os
 from python_settings import settings
 
-keys_list = ["FASTQ_FILE", "BARCODE_FILE", "INDEXING",
-             "ANALYSE_COMBINATION", "BARC_DIFF", "SEQ_DIFF", "SEQUENCER",
-             "OUTPUT_FOLDER", "OUTPUT_FILENAME", "MAX_CONTAMINATION",
-             "SPIKE_BAR_ORDER", "I5_TRIM", "I7_TRIM", "SPIKE_COUNT_ORDER"]
-
 
 def check_parameters():
     # TODO: Add docstrings to this function.
