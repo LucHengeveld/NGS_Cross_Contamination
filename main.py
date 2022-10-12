@@ -14,6 +14,7 @@ if __name__ == "__main__":
     print("Check parameters", time.strftime("%H:%M"))
     settings = pm.check_parameters()
 
+    # TODO: Check barcode file format (unused sequencing method column might be missing)
     # Retrieves the data from the barcode Excel file
     print("Retrieve barcodes from barcode file", time.strftime("%H:%M"))
     barcode_file_data = fr.barcode_file_reader(
