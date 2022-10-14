@@ -443,14 +443,17 @@ def i5_spike_i7_spike(correct_bar_list, correct_spike_list,
             row = 1
             for bar in unknown_dict[barcodes[tab] + "_spike"]:
                 for spike in unknown_dict[barcodes[tab] + "_spike"][bar]:
-                    unknown_bar_spike[tab].write_row(row, 0, [bar, spike, unknown_dict[barcodes[tab] + "_spike"][bar][spike]])
+                    unknown_bar_spike[tab].write_row(row, 0, [
+                        bar, spike, unknown_dict[barcodes[tab] +
+                                                 "_spike"][bar][spike]])
                 row += 1
 
         # Writes the unknown spike-ins and their occurrences to an Excel
         # tab
         row = 1
         for spike in unknown_dict["spike"]:
-            unknown_spike.write_row(row, 0, [spike, unknown_dict["spike"][spike]])
+            unknown_spike.write_row(row, 0, [spike,
+                                             unknown_dict["spike"][spike]])
             row += 1
 
 

@@ -17,7 +17,8 @@ def fastq_reader_no_spike(fastq_path):
             for line in fastq_file:
                 # If line starts with a @ it retrieves the barcode
                 if line.startswith("@"):
-                    fastq_data.append(line[:-2].split(":")[-1])
+                    fastq_data.append(line.replace("\n", "").split(":")[-1])
+
         if len(fastq_data) == 0:
             print("Error 10: Fasta file format is incorrect. No headers"
                   "found.")
