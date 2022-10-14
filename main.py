@@ -11,6 +11,8 @@ if __name__ == "__main__":
     # TODO: Docstrings / comments.
     # Main function of the script, calls the different functions
 
+    # TODO: Sort the unknown barcodes / spike-ins by occurrences
+
     # Checks if the parameters have been entered correctly by the user
     print("Check parameters", time.strftime("%H:%M"))
     settings = pm.check_parameters()
