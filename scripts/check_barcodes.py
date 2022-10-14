@@ -35,36 +35,38 @@ def barc_no_spike(fastq_data, diff_bar_nucl, correct_i5_list,
     unknown_barcodes = {}
     unknown_i5 = {}
     unknown_i7 = {}
-
     try:
         # Checks if the barcode sequence is allowed to differ from the ones
         # in the barcode Excel file. If it is not allowed to differ:
-        if diff_bar_nucl == "0":
+        if diff_bar_nucl == 0:
 
             # Loops through the barcodes from the fastq file
             for barcode in fastq_data:
                 i5, i7 = barcode.split("+")
+
                 # If the i5 and i7 barcode exist in Excel file, increases the
                 # occurrences counter of that specific barcode with 1
-                if i5 in correct_i5_list and i7 in correct_i7_list:
-                    i5_i7_combinations[i5][i7] += 1
+                if i5 in correct_i5_list:
+                    if i7 in correct_i7_list:
+                        # Both i5 and i7 barcodes are known
+                        i5_i7_combinations[i5][i7] += 1
 
-                # If i5 is unknown, adds it to a list
-                elif i5 not in correct_i5_list and i7 in correct_i7_list:
+                    else:
+                        # i7 barcode is unknown
+                        if unknown_i7.get(i7):
+                            unknown_i7[i7] += 1
+                        else:
+                            unknown_i7[i7] = 1
+
+                elif i7 in correct_i7_list:
+                    # If i5 is unknown
                     if unknown_i5.get(i5):
                         unknown_i5[i5] += 1
                     else:
                         unknown_i5[i5] = 1
 
-                # If i7 is unknown, adds it to a list
-                elif i5 in correct_i5_list and i7 not in correct_i7_list:
-                    if unknown_i7.get(i7):
-                        unknown_i7[i7] += 1
-                    else:
-                        unknown_i7[i7] = 1
-
-                # If i5 + i7 both are unknown, it adds the barcode to a list
                 else:
+                    # If i5 + i7 both are unknown
                     if barcode in unknown_barcodes:
                         unknown_barcodes[barcode] += 1
                     else:
