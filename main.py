@@ -11,13 +11,15 @@ if __name__ == "__main__":
     # TODO: Docstrings / comments.
     # Main function of the script, calls the different functions
 
-    # TODO: Sort the unknown barcodes / spike-ins by occurrences
+    # TODO: 1 tab for all unknown sequences:
+    #  - Column i5, i7, spike-in, occurrences
+    #  - Values are booleans
+    #  Sort the unknown barcodes / spike-ins by occurrences
 
     # Checks if the parameters have been entered correctly by the user
     print("Check parameters", time.strftime("%H:%M"))
     settings = pm.check_parameters()
 
-    # TODO: Check barcode file format (unused sequencing method column might be missing)
     # Retrieves the data from the barcode Excel file
     print("Retrieve barcodes from barcode file", time.strftime("%H:%M"))
     barcode_file_data = fr.barcode_file_reader(
@@ -73,9 +75,8 @@ if __name__ == "__main__":
         print("Retrieve barcodes and sequences from fastq file",
               time.strftime("%H:%M"))
         fastq_data = fr.fastq_reader_with_spike(settings.FASTQ_FILE,
-                                                settings.SPIKE_BAR_ORDER,
-                                                settings.I5_TRIM,
-                                                settings.I7_TRIM)
+                                                settings.LEFT_TRIM,
+                                                settings.RIGHT_TRIM)
 
         # Retrieve all possible barcode and spike-in combinations
         print("Create dict of all possible combinations",
@@ -101,7 +102,7 @@ if __name__ == "__main__":
                             correct_spike_list,
                             well_locations, unknown_dict, combinations,
                             output_file, settings.MAX_CONTAMINATION,
-                            settings.ANALYSE_COMBINATION)
+                            settings.ANALYSE_COMBINATION, settings.INDEXING)
         else:
             if settings.INDEXING == 1:
                 # combinatorial spike-ins i5+i7

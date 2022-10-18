@@ -87,14 +87,12 @@ def barcode_file_reader(barcode_file, sequencing_method, analyse_combination):
         exit(15)
 
 
-def fastq_reader_with_spike(fastq_path, trimming_ends, trim_i5, trim_i7):
+def fastq_reader_with_spike(fastq_path, trim_left, trim_right):
     """
     Reads and saves the info from the .fastq file to a dictionary.
     :param fastq_path: Path to the .fastq file.
-    :param trimming_ends: Parameter for the i5 and i7 side of the spike
-            sequences.
-    :param trim_i5: Parameter to trim the i5 side of the spike sequence.
-    :param trim_i7: Parameter to trim the i7 side of the spike sequence.
+    :param trim_left: Parameter to trim the left side of the spike sequence.
+    :param trim_right: Parameter to trim the right side of the spike sequence.
     :return fastq_data: List with the structure [[i5, i7, sequence],[i5, i7,
             sequence], etc].
     """
@@ -114,18 +112,8 @@ def fastq_reader_with_spike(fastq_path, trimming_ends, trim_i5, trim_i7):
                 # variable
                 elif line[:-1].isalpha() and len(templist) > 0:
 
-                    # Checks which sides of the sequence are the i5 and
-                    # i7 ends and saves sequence to list
-                    if trimming_ends == "2":
-                        # Makes sequence reverse and removes the \n
-                        line = line.replace("\n", "")[::-1]
-                        # Adds sequences to list
-                        if trim_i7 == 0:
-                            templist.append(line[trim_i5:])
-                        else:
-                            templist.append(line[trim_i5:-trim_i7])
-                    else:
-                        templist.append(line[trim_i5:-trim_i7-1])
+                    # Saves the sequence to list
+                    templist.append(line[trim_left:-trim_right-1])
                     fastq_data.append(templist)
 
         # Checks if fastq data is empty and returns an error if empty

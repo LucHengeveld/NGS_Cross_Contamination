@@ -199,6 +199,7 @@ def barc_with_spike(combinations, correct_spike_list, correct_i5_list,
                 # Saves the barcodes and correct barcode lists to a
                 # variable and passes the variables to a function
                 # TODO: Fix double counted unknown spike sequences
+                #  - fixed with new unknown data output
                 barcode = read[:2]
                 bar_type = ["i5", "i7"]
                 correct_bar_list = [correct_i5_list, correct_i7_list]

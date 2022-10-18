@@ -74,46 +74,9 @@ def no_spike_output(i5_i7_combinations, unknown_barcodes, unknown_i5,
     with xlsxwriter.Workbook(output_file) as workbook:
         contamination_table = workbook.add_worksheet("Contamination Table")
 
-        # Creates bold and green background color format
-        bold = workbook.add_format({'bold': True})
-        green_bg = workbook.add_format({'bg_color': '#adebad'})
-
-        # Saves the amount of columns and rows to a variable
-        cols = len(excel_2d_list[1])
-        rows = len(excel_2d_list)
-
-        # Set column width
-        contamination_table.set_column(0, cols, 11)
-
-        # Adds borders around the data
-        border_format = workbook.add_format({'border': 1})
-        contamination_table.conditional_format(1, 1, rows, cols,
-                                               {'type': 'no_blanks',
-                                                'format': border_format})
-
-        # Loops through the data and writes it to an Excel sheet with
-        # the correct cell format (bold / green background)
-        for i in range(len(excel_2d_list)):
-            for j in range(len(excel_2d_list[i])):
-                if i in [0, 1] or j in [0, 1]:
-                    contamination_table.write(i, j, excel_2d_list[i][j], bold)
-                elif i == j and 1 < i < len(excel_2d_list) - 1:
-                    if indexing == "1":
-                        contamination_table.write(i, j, excel_2d_list[i][j])
-                    else:
-                        contamination_table.write(i, j, excel_2d_list[i][j],
-                                                  green_bg)
-                elif i != len(excel_2d_list) - 1 and j != \
-                        len(excel_2d_list[i]) - 1:
-                    if indexing == "1":
-                        contamination_table.write(i, j, excel_2d_list[i][j])
-                    else:
-                        contamination_table.write(i, j, excel_2d_list[i][j],
-                                                  heatmap(excel_2d_list, i, j,
-                                                          workbook,
-                                                          max_contamination))
-                else:
-                    contamination_table.write(i, j, excel_2d_list[i][j])
+        # Calls a function to write the contamination table
+        bold = con_table_writer(workbook, excel_2d_list, contamination_table,
+                                indexing, max_contamination)
 
         # Writes all unknown i5 + i7 combinations to an Excel sheet
         unknown_i5_i7_sheet = workbook.add_worksheet("Unknown i5+i7")
@@ -122,6 +85,7 @@ def no_spike_output(i5_i7_combinations, unknown_barcodes, unknown_i5,
         unknown_i5_i7_sheet.write_row(0, 0, ["Unknown i5 + i7 barcodes:",
                                              "Occurrences:"], bold)
 
+        # Writes the unknown barcodes to an Excel tab
         for row in range(len(unknown_barcodes.keys())):
             unknown_i5_i7_sheet.write_row(row + 1, 0,
                                           [list(unknown_barcodes.keys())[row],
@@ -155,7 +119,7 @@ def no_spike_output(i5_i7_combinations, unknown_barcodes, unknown_i5,
 
 def excel_writer(correct_i5_list, correct_i7_list, correct_spike_list,
                  well_locations, unknown_dict, combinations, output_file,
-                 max_contamination, analyse_combination):
+                 max_contamination, analyse_combination, indexing):
     """
     Calls the function for the Excel output file writer.
     :param correct_i5_list: List with all i5 barcodes from entered barcode
@@ -174,20 +138,22 @@ def excel_writer(correct_i5_list, correct_i7_list, correct_spike_list,
     :param output_file: File path to the output file.
     :param max_contamination: Parameter of the maximum allowed contamination.
     :param analyse_combination: Parameter from settings.py.
+    :param indexing: Parameter of the used indexing method.
     """
-    # TODO: Add heatmap to spike-in results
     # Checks which analyse parameter has been used
     if analyse_combination == 2:
         # Calls file_writer function for i5+spike-ins
         file_writer_bar_spike(correct_i5_list, correct_spike_list,
                               well_locations, combinations, output_file,
-                              analyse_combination, unknown_dict)
+                              analyse_combination, unknown_dict, indexing,
+                              max_contamination)
 
     elif analyse_combination == 3:
         # Calls file_writer function for i7+spike-ins
         file_writer_bar_spike(correct_i7_list, correct_spike_list,
                               well_locations, combinations, output_file,
-                              analyse_combination, unknown_dict)
+                              analyse_combination, unknown_dict, indexing,
+                              max_contamination)
 
     elif analyse_combination == 4:
         # Calls file_writer function for i5+spike-ins and i7+spike-ins
@@ -203,7 +169,8 @@ def excel_writer(correct_i5_list, correct_i7_list, correct_spike_list,
 
 def file_writer_bar_spike(correct_bar_list, correct_spike_list,
                           well_locations, combinations, output_file,
-                          analyse_combination, unknown_dict):
+                          analyse_combination, unknown_dict, indexing,
+                          max_contamination):
     """
     Writes the output of i5+spike or i7+spike to an Excel file.
     :param correct_bar_list: List with all i5 or i7 barcodes from the entered
@@ -219,9 +186,11 @@ def file_writer_bar_spike(correct_bar_list, correct_spike_list,
     :param analyse_combination: Parameter from settings.py.
     :param unknown_dict: Dictionary containing all unknown barcodes and
             spike-in sequences.
+    :param indexing: Parameter of the used indexing method.
+    :param max_contamination:
     :return: Excel output file at entered location.
     """
-    # TODO: Add heatmap
+    # TODO: Add last 2 parameters to docstring
     # Checks if i5+spike or i7+spike has been selected
     if analyse_combination == 2:
         excel_2d_list = [["", "", "i5 barcodes →"], ["Well", "Spike-in"]]
@@ -274,21 +243,20 @@ def file_writer_bar_spike(correct_bar_list, correct_spike_list,
 
         # Loops through the Excel 2d list and writes it to an Excel
         # sheet with the correct cell format (bold / green background)
-        for i in range(len(excel_2d_list)):
-            for j in range(len(excel_2d_list[i])):
-                contamination_table.write(i, j, excel_2d_list[i][j])
+        bold = con_table_writer(workbook, excel_2d_list, contamination_table,
+                                indexing, max_contamination)
 
         # Checks if i5+spike has been selected
         if analyse_combination == 2:
 
             # Creates unknown barcode and spike-in sequence Excel tabs
             unknown_bar = workbook.add_worksheet("unknown_i5")
-            unknown_bar.write_row(0, 0, ["i5 barcode", "Occurrences"])
+            unknown_bar.write_row(0, 0, ["i5 barcode", "Occurrences"], bold)
 
             unknown_bar_spike = workbook.add_worksheet("unknown_i5_spike")
             unknown_bar_spike.write_row(0, 0, ["i5 barcode",
                                                "Spike-in sequence",
-                                               "Occurrences"])
+                                               "Occurrences"], bold)
             # Saves the barcode type to a variable
             barcode = "i5"
 
@@ -302,13 +270,13 @@ def file_writer_bar_spike(correct_bar_list, correct_spike_list,
             unknown_bar_spike = workbook.add_worksheet("unknown_i7_spike")
             unknown_bar_spike.write_row(0, 0, ["i7 barcode",
                                                "Spike-in sequence",
-                                               "Occurrences"])
+                                               "Occurrences"], bold)
             # Saves the barcode type to a variable
             barcode = "i7"
 
         # Creates unknown spike-in sequence Excel tab
         unknown_spike = workbook.add_worksheet("unknown_spike")
-        unknown_spike.write_row(0, 0, ["Spike-in sequence", "Occurrences"])
+        unknown_spike.write_row(0, 0, ["Spike-in sequence", "Occurrences"], bold)
 
         # Writes the unknown barcodes and their occurrences to an Excel
         # tab
@@ -455,6 +423,52 @@ def i5_spike_i7_spike(correct_bar_list, correct_spike_list,
             unknown_spike.write_row(row, 0, [spike,
                                              unknown_dict["spike"][spike]])
             row += 1
+
+
+def con_table_writer(workbook, excel_2d_list, contamination_table, indexing,
+                     max_contamination):
+    # TODO: Docstrings
+    # Creates bold and green background color format
+    bold = workbook.add_format({'bold': True})
+    green_bg = workbook.add_format({'bg_color': '#adebad'})
+
+    # Saves the amount of columns and rows to a variable
+    cols = len(excel_2d_list[1])
+    rows = len(excel_2d_list)
+
+    # Set column width
+    contamination_table.set_column(0, cols, 11)
+
+    # Adds borders around the data
+    border_format = workbook.add_format({'border': 1})
+    contamination_table.conditional_format(0, 0, rows, cols,
+                                           {'type': 'no_blanks',
+                                            'format': border_format})
+
+    # Loops through the data and writes it to an Excel sheet with
+    # the correct cell format (bold / green background)
+    for i in range(len(excel_2d_list)):
+        for j in range(len(excel_2d_list[i])):
+            if i in [0, 1] or j in [0, 1]:
+                contamination_table.write(i, j, excel_2d_list[i][j], bold)
+            elif i == j and 1 < i < len(excel_2d_list) - 1:
+                if indexing == "1":
+                    contamination_table.write(i, j, excel_2d_list[i][j])
+                else:
+                    contamination_table.write(i, j, excel_2d_list[i][j],
+                                              green_bg)
+            elif i != len(excel_2d_list) - 1 and j != \
+                    len(excel_2d_list[i]) - 1:
+                if indexing == "1":
+                    contamination_table.write(i, j, excel_2d_list[i][j])
+                else:
+                    contamination_table.write(i, j, excel_2d_list[i][j],
+                                              heatmap(excel_2d_list, i, j,
+                                                      workbook,
+                                                      max_contamination))
+            else:
+                contamination_table.write(i, j, excel_2d_list[i][j])
+    return bold
 
 
 def heatmap(excel_2d_list, i, j, workbook, heatmap_percentage):

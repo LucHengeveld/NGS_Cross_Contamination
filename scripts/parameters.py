@@ -1,6 +1,6 @@
 # Imports the required modules
 import os
-from python_settings import settings
+from python_settings import settings, ImproperlyConfigured
 
 
 def check_parameters():
@@ -37,12 +37,12 @@ def check_parameters():
 
         # Checks if max different nucleotides of barcodes is numeric
         if not isinstance(settings.BARC_DIFF, int) or not settings.BARC_DIFF >= 0:
-            print("Error 1: Barcode nucleotide difference parameter has not been entered correctly in settings.py.")
+            print("Error 1: Barcode nucleotide difference parameter is incorrect.")
             exit(1)
 
         # Checks if max different nucleotides of sequences is numeric
         if not isinstance(settings.SPIKE_DIFF, int) or not settings.SPIKE_DIFF >= 0:
-            print("Error 1: Spike-in nucleotide difference parameter has not been entered correctly in settings.py.")
+            print("Error 1: Spike-in nucleotide difference parameter is incorrect.")
             exit(1)
 
         # Checks if entered sequencer value is correct
@@ -56,26 +56,26 @@ def check_parameters():
             exit(8)
 
         # Checks if entered heatmap contamination percentage is a number
-        if not isinstance(settings.MAX_CONTAMINATION, (int, float)):
-            print("Error 16: Entered heatmap contamination percentage is not a number.")
+        if not isinstance(settings.MAX_CONTAMINATION, (int, float)) or not settings.MAX_CONTAMINATION >= 0:
+            print("Error 16: Entered heatmap contamination percentage is incorrect.")
             exit(16)
 
-        # Checks if trimming ends value is numeric
-        if settings.SPIKE_BAR_ORDER not in [0, 1, 2]:
-            print("Error 17: Entered spike-ins i5 and i7 ends order value is incorrect.")
-            exit(17)
+        # Checks if barcode i7 length value is numeric
+        if not isinstance(settings.I7_LENGTH, int) or settings.I7_LENGTH < 0:
+            print("Error x: Entered i7 barcode length is incorrect.")
+            exit()
 
-        # Checks if trimming i5 end value is numeric
-        if not isinstance(settings.I5_TRIM, int):
-            print("Error 18: Entered spike-ins i5 trimming value is not numeric.")
+        # Checks if trimming left end value is numeric
+        if not isinstance(settings.LEFT_TRIM, int) or settings.I7_LENGTH < 0:
+            print("Error 18: Entered spike-ins left trimming value is incorrect.")
             exit(18)
 
-        # Checks if trimming i7 end value is numeric
-        if not isinstance(settings.I7_TRIM, int):
-            print("Error 19: Entered spike-ins i7 trimming value is not numeric.")
+        # Checks if trimming right end value is numeric
+        if not isinstance(settings.RIGHT_TRIM, int) or settings.I7_LENGTH < 0:
+            print("Error 19: Entered spike-ins right trimming value is incorrect.")
             exit(19)
 
-    except:
+    except ImproperlyConfigured:
         print("Not all parameters have been entered in settings.py.")
         exit(1)
 
