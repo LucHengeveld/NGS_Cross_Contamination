@@ -93,7 +93,7 @@ def fastq_reader_with_spike(fastq_path, trim_left, trim_right):
     :param fastq_path: Path to the .fastq file.
     :param trim_left: Parameter to trim the left side of the spike sequence.
     :param trim_right: Parameter to trim the right side of the spike sequence.
-    :return fastq_data: List with the structure [[i5, i7, sequence],[i5, i7,
+    :return fastq_data: List with the structure [[i5, i7, sequence], [i5, i7,
             sequence], etc].
     """
     # Creates an empty list
