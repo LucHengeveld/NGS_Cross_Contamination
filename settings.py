@@ -17,7 +17,13 @@ INDEXING = 2
 # (3) Spike ins + i7
 # (4) Spike ins + i7 and spike ins + i5
 # (5) Spike ins + i5+i7
-ANALYSE_COMBINATION = 4
+ANALYSE_COMBINATION = 1
+
+# What would you like to analyse?
+# (1) Known and unknown barcodes / spike-in sequences
+# (2) Only known barcodes / spike-in sequences
+# (3) Only unknown barcodes / spike-in sequences
+ANALYSE_TYPE = 1
 
 # Which sequencer has been used?
 # (1) iSeq / MiniSeq / NextSeq / HiSeq3000 / HiSeq4000
@@ -37,7 +43,8 @@ OUTPUT_DIR = 'output\\no-spike\\'
 # OUTPUT_DIR = 'output\\with-spike\\'
 
 # What name would you like to use for the output file?
-OUTPUT_FILENAME = 'test'
+OUTPUT_FILENAME = 'comb_test'
+
 
 # --- UMI: Unique Molecular Identifier ---
 # Enter a 0 as value below if you are not using unique molecular identifiers
