@@ -16,6 +16,7 @@ if __name__ == "__main__":
     #  - Values are booleans
     #  Sort the unknown barcodes / spike-ins by occurrences
 
+    # TODO: Check all output formats
     # Checks if the parameters have been entered correctly by the user
     print("Check parameters", time.strftime("%H:%M"))
     settings = pm.check_parameters()
@@ -97,6 +98,7 @@ if __name__ == "__main__":
         print("Write data to output Excel file", time.strftime("%H:%M"))
         # Checks if you would like to analyse i5+spike or i7+spike
         if settings.ANALYSE_COMBINATION in [2, 3, 4]:
+            # TODO: Combinatorial i5+spike / i7+spike / both
             # Write data to output Excel file
             fw.excel_writer(correct_i5_list, correct_i7_list,
                             correct_spike_list,
@@ -105,10 +107,10 @@ if __name__ == "__main__":
                             settings.ANALYSE_COMBINATION, settings.INDEXING)
         else:
             if settings.INDEXING == 1:
-                # combinatorial spike-ins i5+i7
+                # TODO: combinatorial spike-ins i5+i7
                 pass
             else:
-                # unique i5+i7 spike-ins
+                # TODO: unique i5+i7 spike-ins
                 pass
 
 print("--- Code finished ---\nScript duration:",
