@@ -2,9 +2,9 @@
 import xlsxwriter
 
 
-def no_spike_output(i5_i7_combinations, unknown_barcodes, unknown_i5,
-                    unknown_i7, output_file, i5_i7_loc, indexing,
-                    max_contamination):
+def no_spike_output(i5_i7_combinations, unknown_barcodes, output_file,
+                    i5_i7_loc, indexing, max_contamination,
+                    analyse_combination):
     """
     Creates the output Excel file for unique dual (non-redundant) indexing with
     no spike-in sequence.
@@ -13,20 +13,15 @@ def no_spike_output(i5_i7_combinations, unknown_barcodes, unknown_i5,
             Structure: {i5: {i7: counter}, {i7, counter}}.
     :param unknown_barcodes: Dictionary with all unknown barcode combinations
             from the fastq file.
-    :param unknown_i5: Dictionary with all unknown i5 barcodes from the fastq
-            file.
-    :param unknown_i7: Dictionary with all unknown i7 barcodes from the fastq
-            file.
     :param output_file: File path to the output file.
     :param i5_i7_loc: Dictionary containing the i5 and i7 barcodes with their
             corresponding well locations. Dictionary has the structure:
             {i5: ["A" {i7: 1, i7: 2}]}.
     :param indexing: Parameter of the used indexing method.
     :param max_contamination: Parameter of the maximum allowed contamination.
+    :param analyse_combination: Parameter from settings.py.
     :return: Excel output file at entered location.
     """
-    # TODO: Split this function into multiple ones.
-
     # Create base layout in 2d list for Excel output file
     excel_2d_list = [["", "i7 barcodes →"], ["", ""]]
 
@@ -37,7 +32,7 @@ def no_spike_output(i5_i7_combinations, unknown_barcodes, unknown_i5,
     # Loops through all possible i5 + i7 combinations and adds the
     # occurrences to the Excel 2d array
     for i5 in i5_i7_combinations.keys():
-        if indexing == "1":
+        if indexing == 1:
             row = [i5_i7_loc[i5][0], i5]
         else:
             row = ["", i5]
@@ -46,8 +41,8 @@ def no_spike_output(i5_i7_combinations, unknown_barcodes, unknown_i5,
             row.append(i5_i7_combinations[i5][i7])
             if add_i7:
                 excel_2d_list[1].append(i7)
-                if indexing == "1":
-                    excel_2d_list[0].append(int(i5_i7_loc[i5][1][i7]))
+                if indexing == 1:
+                    excel_2d_list[0].append(i5_i7_loc[i5][1][i7])
 
         # Calculates the row totals
         row.append(sum(row[2:]))
@@ -76,101 +71,206 @@ def no_spike_output(i5_i7_combinations, unknown_barcodes, unknown_i5,
 
         # Calls a function to write the contamination table
         bold = con_table_writer(workbook, excel_2d_list, contamination_table,
-                                indexing, max_contamination)
+                                indexing, max_contamination,
+                                analyse_combination)
 
         # Writes all unknown i5 + i7 combinations to an Excel sheet
-        unknown_i5_i7_sheet = workbook.add_worksheet("Unknown i5+i7")
-        unknown_i5_i7_sheet.set_column("A:A", 23.5)
-        unknown_i5_i7_sheet.set_column("B:B", 11.7)
-        unknown_i5_i7_sheet.write_row(0, 0, ["Unknown i5 + i7 barcodes:",
-                                             "Occurrences:"], bold)
+        unknown_sheet = workbook.add_worksheet("Unknown barcodes")
+        unknown_sheet.write_row(0, 0, ["i5 barcodes:", "i7 barcodes:",
+                                       "i5 known:", "i7 known:",
+                                       "Occurrences:"], bold)
 
-        # Writes the unknown barcodes to an Excel tab
-        for row in range(len(unknown_barcodes.keys())):
-            unknown_i5_i7_sheet.write_row(row + 1, 0,
-                                          [list(unknown_barcodes.keys())[row],
-                                           unknown_barcodes[list(
-                                               unknown_barcodes.keys())[row]]])
+        # Sets the Excel column width
+        unknown_sheet.set_column("A:E", 12)
 
-        # Writes all unknown i5 barcodes to an Excel sheet
-        unknown_i5_sheet = workbook.add_worksheet("Unknown i5")
-        unknown_i5_sheet.set_column("A:A", 20)
-        unknown_i5_sheet.set_column("B:B", 11.7)
-        unknown_i5_sheet.write_row(0, 0, ["Unknown i5 barcodes:",
-                                          "Occurrences:"], bold)
-        for row in range(len(unknown_i5.keys())):
-            unknown_i5_sheet.write_row(row + 1, 0,
-                                       [list(unknown_i5.keys())[row],
-                                        unknown_i5[list(unknown_i5.keys()
-                                                        )[row]]])
-
-        # Writes all unknown i7 barcodes to an Excel sheet
-        unknown_i7_sheet = workbook.add_worksheet("Unknown i7")
-        unknown_i7_sheet.set_column("A:A", 20)
-        unknown_i7_sheet.set_column("B:B", 11.7)
-        unknown_i7_sheet.write_row(0, 0, ["Unknown i7 barcodes:",
-                                          "Occurrences:"], bold)
-        for row in range(len(unknown_i7.keys())):
-            unknown_i7_sheet.write_row(row + 1, 0,
-                                       [list(unknown_i7.keys())[row],
-                                        unknown_i7[list(unknown_i7.keys()
-                                                        )[row]]])
+        row = 1
+        for i5 in unknown_barcodes:
+            for i7 in unknown_barcodes[i5]:
+                unknown_sheet.write_row(row, 0, [i5, i7,
+                                                 unknown_barcodes[i5][i7][0],
+                                                 unknown_barcodes[i5][i7][1],
+                                                 unknown_barcodes[i5][i7][2]])
+                row += 1
 
 
-def excel_writer(correct_i5_list, correct_i7_list, correct_spike_list,
-                 well_locations, unknown_dict, combinations, output_file,
-                 max_contamination, analyse_combination, indexing):
+def con_table_writer(workbook, excel_2d_list, contamination_table, indexing,
+                     max_contamination, analyse_combination):
     """
-    Calls the function for the Excel output file writer.
-    :param correct_i5_list: List with all i5 barcodes from entered barcode
+    Creates the contamination table of the Excel output file.
+    :param workbook: Excel workbook object to save the background color.
+    :param excel_2d_list: 2D list of the Excel output data.
+    :param contamination_table: Excel sheet for the contamination table.
+    :param indexing: Parameter of the used indexing method.
+    :param max_contamination: Parameter of the maximum allowed contamination.
+    :param analyse_combination: Parameter from settings.py.
+    :return bold: Bold Excel workbook format
+    """
+    # Creates bold and green background color format
+    bold = workbook.add_format({'bold': True})
+    green_bg = workbook.add_format({'bg_color': '#adebad'})
+
+    # Saves the amount of columns and rows to a variable
+    cols = len(excel_2d_list[1])
+    rows = len(excel_2d_list)
+
+    # Set column width
+    contamination_table.set_column(0, cols, 13)
+
+    # Adds borders around the data
+    border_format = workbook.add_format({'border': 1})
+    contamination_table.conditional_format(0, 0, rows, cols,
+                                           {'type': 'no_blanks',
+                                            'format': border_format})
+
+    # Checks if user wants to analyse combinatorial indexing i5 + i7
+    if indexing == 1 and analyse_combination == 1:
+        for i in range(len(excel_2d_list)):
+            for j in range(len(excel_2d_list[i])):
+                # Gives the bold format to first two rows / columns
+                if i in [0, 1] or j in [0, 1]:
+                    contamination_table.write(i, j, excel_2d_list[i][j], bold)
+                # Write data to Excel contamination table
+                else:
+                    contamination_table.write(i, j, excel_2d_list[i][j])
+
+    # Checks if user wants to analyse unique indexing or combinatorial
+    # i5 + i7 + spike-ins
+    elif indexing == 2 or (indexing == 1 and analyse_combination == 5):
+        for i in range(len(excel_2d_list)):
+            for j in range(len(excel_2d_list[i])):
+
+                # Gives the bold format to first two rows / columns
+                if i in [0, 1] or j in [0, 1]:
+                    contamination_table.write(i, j, excel_2d_list[i][j], bold)
+
+                # Adds a green background to the correct combinations
+                elif i == j:
+                    contamination_table.write(i, j, excel_2d_list[i][j],
+                                              green_bg)
+
+                # Writes data to the total row / column
+                elif excel_2d_list[i][1] == "Total" or excel_2d_list[1][j] == \
+                        "Total":
+                    contamination_table.write(i, j, excel_2d_list[i][j])
+
+                else:
+                    # Calculates the max allowed contaminated reads of a
+                    # row or column
+                    if i < j:
+                        max_con = round(excel_2d_list[i][i] *
+                                        (max_contamination / 100))
+                    else:
+                        max_con = round(excel_2d_list[j][j] *
+                                        (max_contamination / 100))
+
+                    # Writes all other values to the Excel sheet with
+                    # the correct background color depending on
+                    # contamination
+                    contamination_table.write(i, j, excel_2d_list[i][j],
+                                              heatmap(excel_2d_list, i, j,
+                                                      workbook, max_con))
+
+    # Checks if user wants to analyse combinatorial i5 + spike or i7 +
+    # spike
+    else:
+        for i in range(len(excel_2d_list)):
+            for j in range(len(excel_2d_list[i])):
+
+                # Gives the bold format to first two rows / columns
+                if i in [0, 1] or j in [0, 1]:
+                    contamination_table.write(i, j, excel_2d_list[i][j], bold)
+
+                # Writes data to the total row / column
+                elif excel_2d_list[i][1] == "Total" or excel_2d_list[1][j] == \
+                        "Total":
+                    contamination_table.write(i, j, excel_2d_list[i][j])
+
+                else:
+                    # Writes the correct i5 + spike and i7 + spike
+                    # combinations to Excel with a green background
+                    if excel_2d_list[i][j] == max(excel_2d_list[i][2:-1]):
+                        contamination_table.write(i, j, excel_2d_list[i][j],
+                                                  green_bg)
+
+                    else:
+                        # Calculates the max allowed contaminated reads of a
+                        # row or column
+                        max_con = round(max(excel_2d_list[i][2:-1]) *
+                                        (max_contamination / 100))
+
+                        # Writes all other values to the Excel sheet with
+                        # the correct background color depending on
+                        # contamination
+                        contamination_table.write(i, j, excel_2d_list[i][j],
+                                                  heatmap(excel_2d_list, i, j,
+                                                          workbook, max_con))
+    return bold
+
+
+def spike_outputs(correct_i5_list, correct_i7_list, correct_spike_list,
+                  well_locations, combinations, output_file,
+                  analyse_combination, unknown_dict, indexing,
+                  max_contamination):
+    """
+    Calls the different file writers depending on the entered parameters.
+    :param correct_i5_list: List with all i5 barcodes from the entered barcode
             file.
-    :param correct_i7_list: List with all i7 barcodes from entered barcode
+    :param correct_i7_list: List with all i7 barcodes from the entered barcode
             file.
     :param correct_spike_list: List with all spike-in sequences from the
             entered barcode file.
     :param well_locations: List with all well locations of the different
             barcode + spike-in sequence combinations.
+    :param combinations: Dictionary containing every possible barcode +
+            spike-in sequence combination.
+    :param output_file: File path to the output file.
+    :param analyse_combination: Parameter from settings.py.
     :param unknown_dict: Dictionary containing all unknown barcodes and
             spike-in sequences.
-    :param combinations: Dictionary containing every possible barcode +
-            spike-in sequence combination and the amount of occurrences.
-            Structure depends on analyse_combination parameter.
-    :param output_file: File path to the output file.
-    :param max_contamination: Parameter of the maximum allowed contamination.
-    :param analyse_combination: Parameter from settings.py.
     :param indexing: Parameter of the used indexing method.
+    :param max_contamination: Parameter of the maximum allowed contamination.
     """
-    # Checks which analyse parameter has been used
+    # i5+spike
     if analyse_combination == 2:
-        # Calls file_writer function for i5+spike-ins
-        file_writer_bar_spike(correct_i5_list, correct_spike_list,
-                              well_locations, combinations, output_file,
-                              analyse_combination, unknown_dict, indexing,
-                              max_contamination)
+        if indexing == 1:
+            fw_bar_spike(correct_i5_list, correct_spike_list, well_locations,
+                         combinations, output_file, analyse_combination,
+                         unknown_dict, indexing, max_contamination)
+        else:
+            fw_bar_spike(correct_i5_list, correct_spike_list, well_locations,
+                         combinations, output_file, analyse_combination,
+                         unknown_dict, indexing, max_contamination)
 
+    # i7+spike
     elif analyse_combination == 3:
-        # Calls file_writer function for i7+spike-ins
-        file_writer_bar_spike(correct_i7_list, correct_spike_list,
-                              well_locations, combinations, output_file,
-                              analyse_combination, unknown_dict, indexing,
-                              max_contamination)
+        if indexing == 1:
+            fw_bar_spike(correct_i7_list, correct_spike_list, well_locations,
+                         combinations, output_file, analyse_combination,
+                         unknown_dict, indexing, max_contamination)
+        else:
+            fw_bar_spike(correct_i7_list, correct_spike_list, well_locations,
+                         combinations, output_file, analyse_combination,
+                         unknown_dict, indexing, max_contamination)
 
+    # i5+spike and i7+spike
     elif analyse_combination == 4:
-        # Calls file_writer function for i5+spike-ins and i7+spike-ins
-        i5_spike_i7_spike([correct_i5_list, correct_i7_list],
-                          correct_spike_list, well_locations, combinations,
-                          output_file, unknown_dict)
-
-    # TODO: i5+i7+spike file writer
-    else:
-        # Calls file_writer function for i5+i7+spike-ins
-        pass
-
-
-def file_writer_bar_spike(correct_bar_list, correct_spike_list,
+        fw_both_bar_spike(correct_i5_list, correct_i7_list, correct_spike_list,
                           well_locations, combinations, output_file,
                           analyse_combination, unknown_dict, indexing,
-                          max_contamination):
+                          max_contamination)
+
+    # i5+i7+spike
+    else:
+        filewriter_i5_i7_spike(correct_i5_list, correct_i7_list,
+                               correct_spike_list, well_locations,
+                               combinations, output_file, analyse_combination,
+                               unknown_dict, indexing, max_contamination)
+
+
+def fw_bar_spike(correct_bar_list, correct_spike_list,
+                 well_locations, combinations, output_file,
+                 analyse_combination, unknown_dict, indexing,
+                 max_contamination):
     """
     Writes the output of i5+spike or i7+spike to an Excel file.
     :param correct_bar_list: List with all i5 or i7 barcodes from the entered
@@ -187,10 +287,9 @@ def file_writer_bar_spike(correct_bar_list, correct_spike_list,
     :param unknown_dict: Dictionary containing all unknown barcodes and
             spike-in sequences.
     :param indexing: Parameter of the used indexing method.
-    :param max_contamination:
+    :param max_contamination: Parameter of the maximum allowed contamination.
     :return: Excel output file at entered location.
     """
-    # TODO: Add last 2 parameters to docstring
     # Checks if i5+spike or i7+spike has been selected
     if analyse_combination == 2:
         excel_2d_list = [["", "", "i5 barcodes →"], ["Well", "Spike-in"]]
@@ -244,252 +343,230 @@ def file_writer_bar_spike(correct_bar_list, correct_spike_list,
         # Loops through the Excel 2d list and writes it to an Excel
         # sheet with the correct cell format (bold / green background)
         bold = con_table_writer(workbook, excel_2d_list, contamination_table,
-                                indexing, max_contamination)
+                                indexing, max_contamination,
+                                analyse_combination)
+
+        # Creates a new Excel tab named Unknown combinations
+        unknown_sheet = workbook.add_worksheet("Unknown combinations")
 
         # Checks if i5+spike has been selected
         if analyse_combination == 2:
 
-            # Creates unknown barcode and spike-in sequence Excel tabs
-            unknown_bar = workbook.add_worksheet("unknown_i5")
-            unknown_bar.write_row(0, 0, ["i5 barcode", "Occurrences"], bold)
-
-            unknown_bar_spike = workbook.add_worksheet("unknown_i5_spike")
-            unknown_bar_spike.write_row(0, 0, ["i5 barcode",
-                                               "Spike-in sequence",
-                                               "Occurrences"], bold)
-            # Saves the barcode type to a variable
-            barcode = "i5"
+            # Adds unknown i5 and spike-in row names
+            unknown_sheet.write_row(0, 0, ["i5 barcodes:", "Spike-ins:",
+                                           "i5 known:", "Spike-in known:",
+                                           "Occurrences:"], bold)
 
         # i7+spike has been selected
         else:
 
-            # Creates unknown barcode and spike-in sequence Excel tabs
-            unknown_bar = workbook.add_worksheet("unknown_i7")
-            unknown_bar.write_row(0, 0, ["i7 barcode", "Occurrences"])
-
-            unknown_bar_spike = workbook.add_worksheet("unknown_i7_spike")
-            unknown_bar_spike.write_row(0, 0, ["i7 barcode",
-                                               "Spike-in sequence",
-                                               "Occurrences"], bold)
-            # Saves the barcode type to a variable
-            barcode = "i7"
-
-        # Creates unknown spike-in sequence Excel tab
-        unknown_spike = workbook.add_worksheet("unknown_spike")
-        unknown_spike.write_row(0, 0, ["Spike-in sequence", "Occurrences"], bold)
+            # Adds unknown i7 and spike-in row names
+            unknown_sheet.write_row(0, 0, ["i7 barcodes:", "Spike-ins:",
+                                           "i7 known:", "Spike-in known:",
+                                           "Occurrences:"], bold)
 
         # Writes the unknown barcodes and their occurrences to an Excel
         # tab
         row = 1
-        for bar in unknown_dict[barcode]:
-            unknown_bar.write_row(row, 0, [bar,
-                                           unknown_dict[barcode][bar]])
-            row += 1
-
-        # Writes the unknown spike-ins and their occurrences to an Excel
-        # tab
-        row = 1
-        for spike in unknown_dict["spike"]:
-            unknown_spike.write_row(row, 0, [spike,
-                                             unknown_dict["spike"][spike]])
-            row += 1
-
-        # Writes the unknown barcodes+spike-ins and their occurrences to
-        # an Excel tab
-        row = 1
-        for bar in unknown_dict[barcode + "_spike"]:
-            for spike in unknown_dict[barcode + "_spike"][bar]:
-                unknown_bar_spike.write_row(row, 0, [
-                    bar, spike, unknown_dict[barcode + "_spike"][bar][spike]])
-            row += 1
+        for bar in unknown_dict:
+            for spike in unknown_dict[bar]:
+                unknown_sheet.write_row(row, 0, [bar, spike,
+                                                 unknown_dict[bar][spike][0],
+                                                 unknown_dict[bar][spike][1],
+                                                 unknown_dict[bar][spike][2]])
+                row += 1
 
 
-def i5_spike_i7_spike(correct_bar_list, correct_spike_list,
-                      well_locations, combinations, output_file, unknown_dict):
-    """
-    Writes the output of i5+spike or i7+spike to an Excel file.
-    :param correct_bar_list: List with all i5 or i7 barcodes from the entered
-            barcode file.
-    :param correct_spike_list: List with all spike-in sequences from the
-            entered barcode file.
-    :param well_locations: List with all well locations of the different
-            barcode + spike-in sequence combinations.
-    :param combinations: Dictionary containing every possible barcode +
-            spike-in sequence combination. Structure depends on spike-ins
-            parameter.
-    :param output_file: File path to the output file.
-    :param unknown_dict: Dictionary containing all unknown barcodes and
-            spike-in sequences.
-    :return: Excel output file at entered location.
-    """
-    # TODO: Add heatmap
-    excel_2d_lists = [[["", "", "i5 barcodes →"], ["Well", "Spike-in"]],
-                      [["", "", "i7 barcodes →"], ["Well", "Spike-in"]]]
-    excel_tabnames = ["i5 + spike-in", "i7 + spike-in"]
+def fw_both_bar_spike(correct_i5_list, correct_i7_list,
+                      correct_spike_list, well_locations,
+                      combinations, output_file, analyse_combination,
+                      unknown_dict, indexing, max_contamination):
+    # TODO: Docstrings and comments
+    # TODO: Reuse repeated part
+    excel_2d_list_i5 = [["", "", "i5 barcodes →"], ["Well", "Spike-in"]]
+    excel_tabname_i5 = "i5 + spike-in"
+    excel_2d_list_i7 = [["", "", "i7 barcodes →"], ["Well", "Spike-in"]]
+    excel_tabname_i7 = "i7 + spike-in"
 
     # Adds all well locations to the Excel 2d list
     for i in range(len(well_locations)):
-        excel_2d_lists[0].append([well_locations[i], i + 1])
-        excel_2d_lists[1].append([well_locations[i], i + 1])
+        excel_2d_list_i5.append([well_locations[i], i + 1])
+        excel_2d_list_i7.append([well_locations[i], i + 1])
 
-    for i in range(len(correct_bar_list)):
-        added_barc = []
-        for j in range(len(correct_bar_list[i])):
-            # Adds every barcode and spike-in sequence to the Excel 2d list
-            bar = correct_bar_list[i][j]
-            if bar not in added_barc:
-                added_barc.append(bar)
-                excel_2d_lists[i][1].append(bar)
-                for k in range(len(correct_spike_list)):
-                    spike = correct_spike_list[k]
-                    excel_2d_lists[i][k + 2].append(combinations[bar][spike])
+    # Creates an empty list
+    added_i5 = []
+    added_i7 = []
 
-        # Adds a total column and row
-        excel_2d_lists[i][1].append("Total")
-        excel_2d_lists[i].append(["", "Total"])
+    # Loops through the barcodes from the entered barcode file
+    for i in range(len(correct_i5_list)):
 
-        # Creates an empty list
-        col_tot = []
+        # Adds every barcode and spike-in sequence to the Excel 2d list
+        bar = correct_i5_list[i]
+        if bar not in added_i5:
+            added_i5.append(bar)
+            excel_2d_list_i5[1].append(bar)
+            for j in range(len(correct_spike_list)):
+                spike = correct_spike_list[j]
+                excel_2d_list_i5[j + 2].append(combinations[bar][spike])
 
-        # Adds the total values to the total column / row
-        for row in range(2, len(excel_2d_lists[i]) - 1):
-            excel_2d_lists[i][row].append(sum(excel_2d_lists[i][row][2:]))
-            for value in range(2, len(excel_2d_lists[i][row]) - 1):
-                if len(col_tot) != len(excel_2d_lists[i][row]) - 3:
-                    col_tot.append(excel_2d_lists[i][row][value])
-                else:
-                    col_tot[value - 2] += excel_2d_lists[i][row][value]
-        excel_2d_lists[i][-1].extend(col_tot)
+    # Loops through the barcodes from the entered barcode file
+    for i in range(len(correct_i7_list)):
+
+        # Adds every barcode and spike-in sequence to the Excel 2d list
+        bar = correct_i7_list[i]
+        if bar not in added_i7:
+            added_i7.append(bar)
+            excel_2d_list_i7[1].append(bar)
+            for j in range(len(correct_spike_list)):
+                spike = correct_spike_list[j]
+                excel_2d_list_i7[j + 2].append(combinations[bar][spike])
+
+    # Adds a total column and row
+    excel_2d_list_i5[1].append("Total")
+    excel_2d_list_i5.append(["", "Total"])
+    excel_2d_list_i7[1].append("Total")
+    excel_2d_list_i7.append(["", "Total"])
+
+    # Creates an empty list
+    col_tot_i5 = []
+    col_tot_i7 = []
+
+    # Adds the total values to the total column / row
+    for row in range(2, len(excel_2d_list_i5) - 1):
+        excel_2d_list_i5[row].append(sum(excel_2d_list_i5[row][2:]))
+        for value in range(2, len(excel_2d_list_i5[row]) - 1):
+            if len(col_tot_i5) != len(excel_2d_list_i5[row]) - 3:
+                col_tot_i5.append(excel_2d_list_i5[row][value])
+            else:
+                col_tot_i5[value - 2] += excel_2d_list_i5[row][value]
+    excel_2d_list_i5[-1].extend(col_tot_i5)
+
+    # Adds the total values to the total column / row
+    for row in range(2, len(excel_2d_list_i7) - 1):
+        excel_2d_list_i7[row].append(sum(excel_2d_list_i7[row][2:]))
+        for value in range(2, len(excel_2d_list_i7[row]) - 1):
+            if len(col_tot_i7) != len(excel_2d_list_i7[row]) - 3:
+                col_tot_i7.append(excel_2d_list_i7[row][value])
+            else:
+                col_tot_i7[value - 2] += excel_2d_list_i7[row][value]
+    excel_2d_list_i7[-1].extend(col_tot_i7)
+
+    # Creates the output file
+    with xlsxwriter.Workbook(output_file) as workbook:
+        # Adds a new Excel tab
+        contamination_table_i5 = workbook.add_worksheet(excel_tabname_i5)
+        contamination_table_i7 = workbook.add_worksheet(excel_tabname_i7)
+
+        # Loops through the Excel 2d list and writes it to an Excel
+        # sheet with the correct cell format (bold / green background)
+        con_table_writer(workbook, excel_2d_list_i5, contamination_table_i5,
+                         indexing, max_contamination, analyse_combination)
+
+        bold = con_table_writer(workbook, excel_2d_list_i7,
+                                contamination_table_i7,
+                                indexing, max_contamination,
+                                analyse_combination)
+
+        # Creates a new Excel tab named Unknown combinations
+        unknown_sheet = workbook.add_worksheet("Unknown combinations")
+        unknown_sheet.set_column("A:G", 12)
+
+        # Adds unknown i5, i7 and spike-in row names
+        unknown_sheet.write_row(0, 0, ["i5 barcodes:", "i7 barcodes:",
+                                       "Spike-ins:", "i5 known:", "i7 known:",
+                                       "Spike-in known:", "Occurrences:"], bold
+                                )
+        row = 1
+        for i5 in unknown_dict:
+            for i7 in unknown_dict[i5]:
+                for spike in unknown_dict[i5][i7]:
+                    unknown_sheet.write_row(row, 0, [
+                        i5, i7, spike, unknown_dict[i5][i7][spike][0],
+                        unknown_dict[i5][i7][spike][1],
+                        unknown_dict[i5][i7][spike][2],
+                        unknown_dict[i5][i7][spike][3]])
+                    row += 1
+
+
+def filewriter_i5_i7_spike(correct_i5_list, correct_i7_list,
+                           correct_spike_list, well_locations, combinations,
+                           output_file, analyse_combination, unknown_dict,
+                           indexing, max_contamination):
+    excel_2d_list = [["", "", "i5+i7 barcodes →"], ["Well", "Spike-in"]]
+    excel_tabname = "i5 + i7 + spike-in"
+
+    # Adds all well locations to the Excel 2d list
+    for i in range(len(well_locations)):
+        excel_2d_list.append([well_locations[i], i + 1])
+
+    # Adds all barcodes and occurrences to the Excel 2d list
+    for i in range(len(correct_i5_list)):
+        barcode = correct_i5_list[i] + "+" + correct_i7_list[i]
+        excel_2d_list[1].append(barcode)
+        for j in range(len(correct_spike_list)):
+            spike = correct_spike_list[j]
+            excel_2d_list[j + 2].append(combinations[barcode][spike])
+
+    # Adds a total column and row
+    excel_2d_list[1].append("Total")
+    excel_2d_list.append(["", "Total"])
+
+    # Creates an empty list
+    col_tot = []
+
+    # Adds the total values to the total column / row
+    for row in range(2, len(excel_2d_list) - 1):
+        excel_2d_list[row].append(sum(excel_2d_list[row][2:]))
+        for value in range(2, len(excel_2d_list[row]) - 1):
+            if len(col_tot) != len(excel_2d_list[row]) - 3:
+                col_tot.append(excel_2d_list[row][value])
+            else:
+                col_tot[value - 2] += excel_2d_list[row][value]
+    excel_2d_list[-1].extend(col_tot)
 
     # Creates the output file
     with xlsxwriter.Workbook(output_file) as workbook:
 
-        # Adds new Excel tabs
-        contamination_tables = [workbook.add_worksheet(excel_tabnames[0]),
-                                workbook.add_worksheet(excel_tabnames[1])]
+        # Adds a new Excel tab
+        contamination_table = workbook.add_worksheet(excel_tabname)
 
         # Loops through the Excel 2d list and writes it to an Excel
         # sheet with the correct cell format (bold / green background)
-        for index in range(len(excel_2d_lists)):
-            for i in range(len(excel_2d_lists[index])):
-                for j in range(len(excel_2d_lists[index][i])):
-                    contamination_tables[index].write(
-                        i, j, excel_2d_lists[index][i][j])
+        bold = con_table_writer(workbook, excel_2d_list, contamination_table,
+                                indexing, max_contamination,
+                                analyse_combination)
 
-        # Creates unknown barcode and barcode+spike-in sequence
-        # Excel tabs
-        unknown_bar = [workbook.add_worksheet("unknown_i5"),
-                       workbook.add_worksheet("unknown_i7")]
-        unknown_bar[0].write_row(0, 0, ["i5 barcode", "Occurrences"])
-        unknown_bar[1].write_row(0, 0, ["i7 barcode", "Occurrences"])
+        # Creates a new Excel tab named Unknown combinations
+        unknown_sheet = workbook.add_worksheet("Unknown combinations")
 
-        unknown_bar_spike = [workbook.add_worksheet("unknown_i5_spike"),
-                             workbook.add_worksheet("unknown_i7_spike")]
-        unknown_bar_spike[0].write_row(0, 0, ["i5 barcode",
-                                              "Spike-in sequence",
-                                              "Occurrences"])
-        unknown_bar_spike[1].write_row(0, 0, ["i7 barcode",
-                                              "Spike-in sequence",
-                                              "Occurrences"])
+        # Adds unknown i5, i7 and spike-in row names
+        unknown_sheet.write_row(0, 0, ["i5 barcodes:", "i7 barcodes:",
+                                       "Spike-ins:", "i5 known:", "i7 known:",
+                                       "Spike-in known:", "Occurrences:"], bold
+                                )
 
-        # Creates unknown spike-in sequence Excel tab
-        unknown_spike = workbook.add_worksheet("unknown_spike")
-        unknown_spike.write_row(0, 0, ["Spike-in sequence", "Occurrences"])
-
-        # Writes the unknown barcodes and their occurrences to an Excel
-        # tab
-        barcodes = ["i5", "i7"]
-        for tab in range(len(unknown_bar)):
-            row = 1
-            for bar in unknown_dict[barcodes[tab]]:
-                unknown_bar[tab].write_row(
-                    row, 0, [bar, unknown_dict[barcodes[tab]][bar]])
-                row += 1
-
-            # Writes the unknown barcodes+spike-ins and their occurrences to
-            # an Excel tab
-            row = 1
-            for bar in unknown_dict[barcodes[tab] + "_spike"]:
-                for spike in unknown_dict[barcodes[tab] + "_spike"][bar]:
-                    unknown_bar_spike[tab].write_row(row, 0, [
-                        bar, spike, unknown_dict[barcodes[tab] +
-                                                 "_spike"][bar][spike]])
-                row += 1
-
-        # Writes the unknown spike-ins and their occurrences to an Excel
-        # tab
         row = 1
-        for spike in unknown_dict["spike"]:
-            unknown_spike.write_row(row, 0, [spike,
-                                             unknown_dict["spike"][spike]])
-            row += 1
+        for i5 in unknown_dict:
+            for i7 in unknown_dict[i5]:
+                for spike in unknown_dict[i5][i7]:
+                    unknown_sheet.write_row(row, 0, [
+                        i5, i7, spike, unknown_dict[i5][i7][spike][0],
+                        unknown_dict[i5][i7][spike][1],
+                        unknown_dict[i5][i7][spike][2],
+                        unknown_dict[i5][i7][spike][3]])
+                    row += 1
 
 
-def con_table_writer(workbook, excel_2d_list, contamination_table, indexing,
-                     max_contamination):
-    # TODO: Docstrings
-    # Creates bold and green background color format
-    bold = workbook.add_format({'bold': True})
-    green_bg = workbook.add_format({'bg_color': '#adebad'})
-
-    # Saves the amount of columns and rows to a variable
-    cols = len(excel_2d_list[1])
-    rows = len(excel_2d_list)
-
-    # Set column width
-    contamination_table.set_column(0, cols, 11)
-
-    # Adds borders around the data
-    border_format = workbook.add_format({'border': 1})
-    contamination_table.conditional_format(0, 0, rows, cols,
-                                           {'type': 'no_blanks',
-                                            'format': border_format})
-
-    # Loops through the data and writes it to an Excel sheet with
-    # the correct cell format (bold / green background)
-    for i in range(len(excel_2d_list)):
-        for j in range(len(excel_2d_list[i])):
-            if i in [0, 1] or j in [0, 1]:
-                contamination_table.write(i, j, excel_2d_list[i][j], bold)
-            elif i == j and 1 < i < len(excel_2d_list) - 1:
-                if indexing == "1":
-                    contamination_table.write(i, j, excel_2d_list[i][j])
-                else:
-                    contamination_table.write(i, j, excel_2d_list[i][j],
-                                              green_bg)
-            elif i != len(excel_2d_list) - 1 and j != \
-                    len(excel_2d_list[i]) - 1:
-                if indexing == "1":
-                    contamination_table.write(i, j, excel_2d_list[i][j])
-                else:
-                    contamination_table.write(i, j, excel_2d_list[i][j],
-                                              heatmap(excel_2d_list, i, j,
-                                                      workbook,
-                                                      max_contamination))
-            else:
-                contamination_table.write(i, j, excel_2d_list[i][j])
-    return bold
-
-
-def heatmap(excel_2d_list, i, j, workbook, heatmap_percentage):
+def heatmap(excel_2d_list, i, j, workbook, max_con):
     """
     Returns the cell background color format.
     :param excel_2d_list: 2D list of the Excel output data.
     :param i: y-coordinate of current cell in excel_2d_list.
     :param j: x-coordinate of current cell in excel_2d_list.
     :param workbook: Excel workbook object to save the background color.
-    :param heatmap_percentage: Parameter of the maximum allowed contamination.
+    :param max_con: Maximum allowed contaminated reads.
     :return bg_format: Background color format for a specific cell.
     """
-    # TODO: Add 3 colors to heatmap (green -> yellow -> red)
-    # Checks if cell values should be compared to the correct barcode
-    # value in its row or column and calculates the max amount of
-    # contaminated reads
-    if i < j:
-        max_con = round(excel_2d_list[i][i] * (heatmap_percentage / 100))
-    else:
-        max_con = round(excel_2d_list[j][j] * (heatmap_percentage / 100))
-
     # If the correct barcode has value 0 and current cell has value 0,
     # return white background color
     if max_con == 0 and excel_2d_list[i][j] == 0:

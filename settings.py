@@ -47,7 +47,7 @@ OUTPUT_FILENAME = 'comb_test'
 
 
 # --- UMI: Unique Molecular Identifier ---
-# Enter a 0 as value below if you are not using unique molecular identifiers
+# Enter a 0 as value for the parameter below if you are not using unique molecular identifiers.
 
 # What is the i7 barcode length? (all nucleotides after this specific length
 # are seen as UMIs)
