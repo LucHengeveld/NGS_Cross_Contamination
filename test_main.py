@@ -7,20 +7,20 @@ from test_scripts import check_barcodes_test as cb, file_writers_test as fw
 import time
 
 start_time = time.time()
+print("--- Code started at", time.strftime("%H:%M", time.localtime()), "---\n")
 
-if __name__ == "__main__":
+
+def main():
+
     # Main function of the script, calls the different functions
 
     # TODO: Update/create docstrings and comments in all scripts
 
-    # TODO: 1 tab for all unknown sequences:
-    #  - Column i5, i7, spike-in, occurrences
-    #  - Values are booleans
-    #  Sort the unknown barcodes / spike-ins by occurrences
-
     # TODO: Improve speed by directly running code when reading every fastq
     #  line instead of saving it to a list first or pass every 100 000 lines
     #  parallel to compare function
+
+    # TODO: Implement parameter ANALYSE_TYPE
 
     # Checks if the parameters have been entered correctly by the user
     print("Check parameters", time.strftime("%H:%M"))
@@ -109,12 +109,18 @@ if __name__ == "__main__":
                 correct_i7_list, fastq_data, settings.BARC_DIFF,
                 settings.SPIKE_DIFF, settings.ANALYSE_COMBINATION)
 
-        else:
-            # i5+i7+spike
+        elif settings.INDEXING == 1:
+            #  Combinatorial i5+i7+spike
             combinations, unknown_dict = cb.comp_i5_i7_spike(
                 combinations, correct_spike_list, correct_i5_list,
                 correct_i7_list, fastq_data, settings.BARC_DIFF,
-                settings.SPIKE_DIFF)
+                settings.SPIKE_DIFF, settings.INDEXING)
+        else:
+            #  Unique i5+i7+spike
+            combinations, unknown_dict = cb.comp_i5_i7_spike(
+                combinations, correct_spike_list, correct_i5_list,
+                correct_i7_list, fastq_data, settings.BARC_DIFF,
+                settings.SPIKE_DIFF, settings.INDEXING)
 
         print("Write data to output Excel file", time.strftime("%H:%M"))
         fw.spike_outputs(correct_i5_list, correct_i7_list, correct_spike_list,
@@ -122,6 +128,9 @@ if __name__ == "__main__":
                          settings.ANALYSE_COMBINATION, unknown_dict, settings.INDEXING,
                          settings.MAX_CONTAMINATION)
 
-print("--- Code finished ---\nScript duration:",
-      round(time.time() - start_time),
-      "seconds")
+
+if __name__ == "__main__":
+    main()
+
+print("\n--- Code ended at", time.strftime("%H:%M", time.localtime()),
+      "---\nScript duration:", round(time.time() - start_time), "seconds")
