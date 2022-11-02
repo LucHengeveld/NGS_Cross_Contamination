@@ -16,7 +16,7 @@ INDEXING = 2
 # (2) Spike ins + i5
 # (3) Spike ins + i7
 # (4) Spike ins + i7 and spike ins + i5
-# (5) Spike ins + i5+i7
+# (5) Spike ins + i5 + i7
 ANALYSE_COMBINATION = 1
 
 # What would you like to analyse?
@@ -49,7 +49,8 @@ OUTPUT_FILENAME = 'comb_test'
 # --- UMI: Unique Molecular Identifier ---
 # Enter a 0 as value below if you are not using unique molecular identifiers
 
-# What is the i7 barcode length?
+# What is the i7 barcode length? (all nucleotides after this specific length
+# are seen as UMIs)
 I7_LENGTH = 0
 
 
