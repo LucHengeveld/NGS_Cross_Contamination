@@ -1,5 +1,3 @@
-# Imports the other python scripts
-
 # Imports the required modules
 from Levenshtein import distance
 import re
