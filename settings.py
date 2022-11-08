@@ -49,13 +49,12 @@ OUTPUT_FILENAME = 'comb_test'
 # --- UMI: Unique Molecular Identifier ---
 # Enter a 0 as value for the parameter below if you are not using unique molecular identifiers.
 
-# What is the i7 barcode length? (all nucleotides after this specific length
-# are seen as UMIs)
-I7_LENGTH = 0
+# What is the UMI length? (Last x nucleotides are seen as a UMI)
+UMI_LENGTH = 1
 
 
 # --- Spike-ins ---
-# Enter a 0 as value for the parameters below if you are not using spike-in sequences
+# Enter a 0 as value for the parameters below if you are not using spike-in sequences.
 
 # If using spike-ins: how many nucleotides are the found spike-in sequences allowed to differ from
 # the original sequences?
