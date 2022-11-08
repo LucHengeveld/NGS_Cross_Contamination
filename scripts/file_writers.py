@@ -261,10 +261,10 @@ def spike_outputs(correct_i5_list, correct_i7_list, correct_spike_list,
 
     # i5+i7+spike
     else:
-        filewriter_i5_i7_spike(correct_i5_list, correct_i7_list,
-                               correct_spike_list, well_locations,
-                               combinations, output_file, analyse_combination,
-                               unknown_dict, indexing, max_contamination)
+        fw_i5_i7_spike(correct_i5_list, correct_i7_list,
+                       correct_spike_list, well_locations,
+                       combinations, output_file, analyse_combination,
+                       unknown_dict, indexing, max_contamination)
 
 
 def fw_bar_spike(correct_bar_list, correct_spike_list,
@@ -299,40 +299,9 @@ def fw_bar_spike(correct_bar_list, correct_spike_list,
         excel_tabname = "i7 + spike-in"
 
     # Adds all well locations to the Excel 2d list
-    for i in range(len(well_locations)):
-        excel_2d_list.append([well_locations[i], i + 1])
-
-    # Creates an empty list
-    added_barc = []
-
-    # Loops through the barcodes from the entered barcode file
-    for i in range(len(correct_bar_list)):
-
-        # Adds every barcode and spike-in sequence to the Excel 2d list
-        bar = correct_bar_list[i]
-        if bar not in added_barc:
-            added_barc.append(bar)
-            excel_2d_list[1].append(bar)
-            for j in range(len(correct_spike_list)):
-                spike = correct_spike_list[j]
-                excel_2d_list[j + 2].append(combinations[bar][spike])
-
-    # Adds a total column and row
-    excel_2d_list[1].append("Total")
-    excel_2d_list.append(["", "Total"])
-
-    # Creates an empty list
-    col_tot = []
-
-    # Adds the total values to the total column / row
-    for row in range(2, len(excel_2d_list) - 1):
-        excel_2d_list[row].append(sum(excel_2d_list[row][2:]))
-        for value in range(2, len(excel_2d_list[row]) - 1):
-            if len(col_tot) != len(excel_2d_list[row]) - 3:
-                col_tot.append(excel_2d_list[row][value])
-            else:
-                col_tot[value - 2] += excel_2d_list[row][value]
-    excel_2d_list[-1].extend(col_tot)
+    excel_2d_list = excel_list_bar_spike(
+        well_locations, excel_2d_list, correct_bar_list, correct_spike_list,
+        combinations)
 
     # Creates the output file
     with xlsxwriter.Workbook(output_file) as workbook:
@@ -381,75 +350,43 @@ def fw_both_bar_spike(correct_i5_list, correct_i7_list,
                       correct_spike_list, well_locations,
                       combinations, output_file, analyse_combination,
                       unknown_dict, indexing, max_contamination):
-    # TODO: Docstrings and comments
-    # TODO: Reuse repeated part
+    """
+    Creates the output Excel file for i5 + spike-ins and i7 + spike-ins.
+    :param correct_i5_list: List with all i5 barcodes from the entered barcode
+            file.
+    :param correct_i7_list: List with all i7 barcodes from the entered barcode
+            file.
+    :param correct_spike_list: List with all spike-in sequences from the
+            entered barcode file.
+    :param well_locations: List with all well locations of the different
+            barcode + spike-in sequence combinations.
+    :param combinations: Dictionary containing every possible barcode +
+            spike-in sequence combination. Structure depends on spike-ins
+            parameter.
+    :param output_file: File path to the output file.
+    :param analyse_combination: Parameter from settings.py.
+    :param unknown_dict: Dictionary containing all unknown barcodes and
+            spike-in sequences.
+    :param indexing: Parameter of the used indexing method.
+    :param max_contamination: Parameter of the maximum allowed contamination.
+    :return: Excel output file at entered location.
+    """
+    # Creates the base layout for the Excel contamination tab and saves
+    # the tab name to a variable
     excel_2d_list_i5 = [["", "", "i5 barcodes →"], ["Well", "Spike-in"]]
     excel_tabname_i5 = "i5 + spike-in"
     excel_2d_list_i7 = [["", "", "i7 barcodes →"], ["Well", "Spike-in"]]
     excel_tabname_i7 = "i7 + spike-in"
 
-    # Adds all well locations to the Excel 2d list
-    for i in range(len(well_locations)):
-        excel_2d_list_i5.append([well_locations[i], i + 1])
-        excel_2d_list_i7.append([well_locations[i], i + 1])
+    # Creates the Excel 2d list for the i5 barcodes
+    excel_2d_list_i5 = excel_list_bar_spike(
+        well_locations, excel_2d_list_i5, correct_i5_list, correct_spike_list,
+        combinations)
 
-    # Creates an empty list
-    added_i5 = []
-    added_i7 = []
-
-    # Loops through the barcodes from the entered barcode file
-    for i in range(len(correct_i5_list)):
-
-        # Adds every barcode and spike-in sequence to the Excel 2d list
-        bar = correct_i5_list[i]
-        if bar not in added_i5:
-            added_i5.append(bar)
-            excel_2d_list_i5[1].append(bar)
-            for j in range(len(correct_spike_list)):
-                spike = correct_spike_list[j]
-                excel_2d_list_i5[j + 2].append(combinations[bar][spike])
-
-    # Loops through the barcodes from the entered barcode file
-    for i in range(len(correct_i7_list)):
-
-        # Adds every barcode and spike-in sequence to the Excel 2d list
-        bar = correct_i7_list[i]
-        if bar not in added_i7:
-            added_i7.append(bar)
-            excel_2d_list_i7[1].append(bar)
-            for j in range(len(correct_spike_list)):
-                spike = correct_spike_list[j]
-                excel_2d_list_i7[j + 2].append(combinations[bar][spike])
-
-    # Adds a total column and row
-    excel_2d_list_i5[1].append("Total")
-    excel_2d_list_i5.append(["", "Total"])
-    excel_2d_list_i7[1].append("Total")
-    excel_2d_list_i7.append(["", "Total"])
-
-    # Creates an empty list
-    col_tot_i5 = []
-    col_tot_i7 = []
-
-    # Adds the total values to the total column / row
-    for row in range(2, len(excel_2d_list_i5) - 1):
-        excel_2d_list_i5[row].append(sum(excel_2d_list_i5[row][2:]))
-        for value in range(2, len(excel_2d_list_i5[row]) - 1):
-            if len(col_tot_i5) != len(excel_2d_list_i5[row]) - 3:
-                col_tot_i5.append(excel_2d_list_i5[row][value])
-            else:
-                col_tot_i5[value - 2] += excel_2d_list_i5[row][value]
-    excel_2d_list_i5[-1].extend(col_tot_i5)
-
-    # Adds the total values to the total column / row
-    for row in range(2, len(excel_2d_list_i7) - 1):
-        excel_2d_list_i7[row].append(sum(excel_2d_list_i7[row][2:]))
-        for value in range(2, len(excel_2d_list_i7[row]) - 1):
-            if len(col_tot_i7) != len(excel_2d_list_i7[row]) - 3:
-                col_tot_i7.append(excel_2d_list_i7[row][value])
-            else:
-                col_tot_i7[value - 2] += excel_2d_list_i7[row][value]
-    excel_2d_list_i7[-1].extend(col_tot_i7)
+    # Creates the Excel 2d list for the i7 barcodes
+    excel_2d_list_i7 = excel_list_bar_spike(
+        well_locations, excel_2d_list_i7, correct_i7_list, correct_spike_list,
+        combinations)
 
     # Creates the output file
     with xlsxwriter.Workbook(output_file) as workbook:
@@ -476,6 +413,7 @@ def fw_both_bar_spike(correct_i5_list, correct_i7_list,
                                        "Spike-ins:", "i5 known:", "i7 known:",
                                        "Spike-in known:", "Occurrences:"], bold
                                 )
+        # Writes the unknown data to the unknown Excel tab
         row = 1
         for i5 in unknown_dict:
             for i7 in unknown_dict[i5]:
@@ -488,10 +426,88 @@ def fw_both_bar_spike(correct_i5_list, correct_i7_list,
                     row += 1
 
 
-def filewriter_i5_i7_spike(correct_i5_list, correct_i7_list,
-                           correct_spike_list, well_locations, combinations,
-                           output_file, analyse_combination, unknown_dict,
-                           indexing, max_contamination):
+def excel_list_bar_spike(well_locations, excel_2d_list, correct_bar_list,
+                         correct_spike_list, combinations):
+    """
+    Creates a 2D list of the found contamination.
+    :param well_locations: List with all well locations of the different
+            barcode + spike-in sequence combinations.
+    :param excel_2d_list: 2D list of the Excel output data.
+    :param correct_bar_list: List with all i5 or i7 barcodes from the entered
+            barcode file.
+    :param correct_spike_list: List with all spike-in sequences from the
+            entered barcode file.
+    :param combinations: Dictionary containing every possible barcode +
+            spike-in sequence combination. Structure depends on spike-ins
+            parameter.
+    :return excel_2d_list: 2D list of the Excel output data.
+    """
+    # Adds all well locations to the Excel 2d list
+    for i in range(len(well_locations)):
+        excel_2d_list.append([well_locations[i], i + 1])
+
+    # Creates an empty list
+    added_barc = []
+
+    # Loops through the barcodes from the entered barcode file
+    for i in range(len(correct_bar_list)):
+
+        # Adds every barcode and spike-in sequence to the Excel 2d list
+        bar = correct_bar_list[i]
+        if bar not in added_barc:
+            added_barc.append(bar)
+            excel_2d_list[1].append(bar)
+            for j in range(len(correct_spike_list)):
+                spike = correct_spike_list[j]
+                excel_2d_list[j + 2].append(combinations[bar][spike])
+
+    # Adds a total column and row
+    excel_2d_list[1].append("Total")
+    excel_2d_list.append(["", "Total"])
+
+    # Creates an empty list
+    col_tot = []
+
+    # Adds the total values to the total column / row
+    for row in range(2, len(excel_2d_list) - 1):
+        excel_2d_list[row].append(sum(excel_2d_list[row][2:]))
+        for value in range(2, len(excel_2d_list[row]) - 1):
+            if len(col_tot) != len(excel_2d_list[row]) - 3:
+                col_tot.append(excel_2d_list[row][value])
+            else:
+                col_tot[value - 2] += excel_2d_list[row][value]
+    excel_2d_list[-1].extend(col_tot)
+
+    return excel_2d_list
+
+
+def fw_i5_i7_spike(correct_i5_list, correct_i7_list,
+                   correct_spike_list, well_locations, combinations,
+                   output_file, analyse_combination, unknown_dict,
+                   indexing, max_contamination):
+    """
+    Writes the output of i5 + i7 + spike-ins to an Excel file.
+    :param correct_i5_list: List with all i5 barcodes from the entered barcode
+            file.
+    :param correct_i7_list: List with all i7 barcodes from the entered barcode
+            file.
+    :param correct_spike_list: List with all spike-in sequences from the
+            entered barcode file.
+    :param well_locations: List with all well locations of the different
+            barcode + spike-in sequence combinations.
+    :param combinations: Dictionary containing every possible barcode +
+            spike-in sequence combination. Structure depends on spike-ins
+            parameter.
+    :param output_file: File path to the output file.
+    :param analyse_combination: Parameter from settings.py.
+    :param unknown_dict: Dictionary containing all unknown barcodes and
+            spike-in sequences.
+    :param indexing: Parameter of the used indexing method.
+    :param max_contamination: Parameter of the maximum allowed contamination.
+    :return: Excel output file at entered location.
+    """
+    # Creates the base structure of the Excel 2D list and saves the tab
+    # name to a variable
     excel_2d_list = [["", "", "i5+i7 barcodes →"], ["Well", "Spike-in"]]
     excel_tabname = "i5 + i7 + spike-in"
 
