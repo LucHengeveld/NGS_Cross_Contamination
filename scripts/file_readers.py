@@ -2,33 +2,51 @@
 import openpyxl
 
 
-def fastq_reader_no_spike(fastq_path):
+def fastq_reader_no_spike(fastq_path, umi_length):
     """
     Reads and saves the info from the .fastq file to a list.
     :param fastq_path: Path to the .fastq file.
+    :param umi_length: Length of the unique molecular identifier. Entered by
+        user in settings.py.
     :return fastq_data: List with the structure [barcode 1, barcode2, etc].
     """
-    # Creates an empty list
+    # Creates an empty list and set
     fastq_data = []
-
+    umi_set = set()
     try:
         # Opens the .fastq and reads it line by line
         with open(fastq_path, "r") as fastq_file:
-            for line in fastq_file:
-                # If line starts with a @ it retrieves the barcode
-                if line.startswith("@"):
-                    fastq_data.append(line.replace("\n", "").split(":")[-1])
-
+            # Checks if the user used UMIs
+            if umi_length == 0:
+                for line in fastq_file:
+                    # If line starts with a @ it retrieves the barcode
+                    if line.startswith("@"):
+                        fastq_data.append(line.replace("\n", "").
+                                          split(":")[-1])
+            else:
+                for line in fastq_file:
+                    # If line starts with a @ it retrieves the barcode
+                    if line.startswith("@"):
+                        # Retrieves the UMI sequence from the header
+                        umi = line.replace("\n", "").split(":")[-1].\
+                            split("+")[1][-umi_length:]
+                        # Adds the barcodes to a list if UMI has not
+                        # been found in previous reads
+                        if umi not in umi_set:
+                            umi_set.add(umi)
+                            fastq_data.append(line.replace("\n", "").
+                                              split(":")[-1])
         if len(fastq_data) == 0:
-            print("Error 10: Fasta file format is incorrect. No headers"
+            print("Error 15: Fasta file format is incorrect. No headers"
                   "found.")
-            exit(10)
+            exit(15)
+
         # Returns the fastq list
         return fastq_data
 
     except FileNotFoundError:
-        print("Error 11: Entered fastq file has not been found.")
-        exit(11)
+        print("Error 16: Entered fastq file has not been found.")
+        exit(16)
 
 
 def barcode_file_reader(barcode_file, sequencing_method, analyse_combination):
@@ -49,8 +67,8 @@ def barcode_file_reader(barcode_file, sequencing_method, analyse_combination):
 
     except FileNotFoundError:
         # Returns an error if file has not been found
-        print("Error 13: Entered barcode file has not been found.")
-        exit(13)
+        print("Error 17: Entered barcode file has not been found.")
+        exit(17)
 
     # Creates an empty list and dictionary
     barcode_file_list = []
@@ -79,53 +97,77 @@ def barcode_file_reader(barcode_file, sequencing_method, analyse_combination):
             return barcode_file_dict
 
     # Returns an error if file format is incorrect
-    except IndexError:
-        print("Error 14: Barcode file format incorrect.")
-        exit(14)
-    except TypeError:
-        print("Error 15: Barcode file format incorrect.")
-        exit(15)
+    except IndexError or TypeError:
+        print("Error 18: Barcode file format incorrect.")
+        exit(18)
 
 
-def fastq_reader_with_spike(fastq_path, trim_left, trim_right):
+def fastq_reader_with_spike(fastq_path, trim_left, trim_right, umi_length):
     """
     Reads and saves the info from the .fastq file to a dictionary.
     :param fastq_path: Path to the .fastq file.
     :param trim_left: Parameter to trim the left side of the spike sequence.
     :param trim_right: Parameter to trim the right side of the spike sequence.
+    :param umi_length: Length of the unique molecular identifier. Entered by
+        user in settings.py.
     :return fastq_data: List with the structure [[i5, i7, sequence], [i5, i7,
             sequence], etc].
     """
-    # Creates an empty list
+    # Creates an empty list amd set
     fastq_data = []
+    umi_set = set()
 
     try:
         # Opens the .fastq and reads it line by line
         with open(fastq_path, "r") as fastq_file:
-            for line in fastq_file:
+            # Checks if the user used UMIs
+            if umi_length == 0:
+                for line in fastq_file:
+                    # If line starts with a @ it retrieves the barcode
+                    if line.startswith("@"):
+                        templist = line.replace("\n", "").split(":")[-1].\
+                            split("+")
 
-                # If line starts with a @ it retrieves the barcode
-                if line.startswith("@"):
-                    templist = line.replace("\n", "").split(":")[-1].split("+")
+                    # Checks if line contains only letters and saves it to a
+                    # variable
+                    elif line[:-1].isalpha() and len(templist) > 0:
 
-                # Checks if line contains only letters and saves it to a
-                # variable
-                elif line[:-1].isalpha() and len(templist) > 0:
+                        # Saves the sequence to list
+                        templist.append(line[trim_left:-trim_right-1])
+                        fastq_data.append(templist)
+            else:
+                umi_bool = False
+                for line in fastq_file:
+                    # If line starts with a @ it retrieves the barcode
+                    if line.startswith("@"):
+                        templist = line.replace("\n", "").split(":")[-1].split(
+                            "+")
+                        # Checks if UMI has been found in previous reads
+                        if templist[1][-umi_length:] in umi_set:
+                            umi_bool = True
+                        else:
+                            umi_bool = False
+                            # Adds the UMI sequence to a set
+                            umi_set.add(templist[1][-umi_length:])
+                            templist[1] = templist[1][:-umi_length]
+                    elif not umi_bool:
+                        # Checks if line contains only letters and saves it to
+                        # a variable
+                        if line[:-1].isalpha() and len(templist) > 0:
 
-                    # Saves the sequence to list
-                    templist.append(line[trim_left:-trim_right-1])
-                    fastq_data.append(templist)
-
+                            # Saves the sequence to list
+                            templist.append(line[trim_left:-trim_right - 1])
+                            fastq_data.append(templist)
         # Checks if fastq data is empty and returns an error if empty
         if len(fastq_data) == 0:
-            print("Error 21: Fasta file format is incorrect. No headers or "
+            print("Error 19: Fasta file format is incorrect. No headers or "
                   "sequences found.")
-            exit(21)
+            exit(19)
 
         # Returns the fastq list
         return fastq_data
 
     except FileNotFoundError:
         # Returns an error if fastq file has not been found
-        print("Error 22: Entered fastq file has not been found.")
-        exit(22)
+        print("Error 20: Entered fastq file has not been found.")
+        exit(20)

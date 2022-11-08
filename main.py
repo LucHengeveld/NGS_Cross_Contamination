@@ -16,7 +16,7 @@ def main():
     #  line instead of saving it to a list first or pass every 100 000 lines
     #  parallel to compare function
 
-    # TODO: Implement parameters ANALYSE_TYPE and I7_LENGTH (UMI)
+    # TODO: Implement parameters ANALYSE_TYPE
 
     # Checks if the parameters have been entered correctly by the user
     print("Check parameters", time.strftime("%H:%M"))
@@ -38,7 +38,8 @@ def main():
 
         # Retrieve barcodes from fastq file
         print("Retrieve barcodes from fastq file", time.strftime("%H:%M"))
-        fastq_data = fr.fastq_reader_no_spike(settings.FASTQ_FILE)
+        fastq_data = fr.fastq_reader_no_spike(settings.FASTQ_FILE,
+                                              settings.UMI_LENGTH)
 
         # Retrieve all possible barcode combinations
         print("Retrieve barcodes from barcode file", time.strftime("%H:%M"))
@@ -79,7 +80,8 @@ def main():
               time.strftime("%H:%M"))
         fastq_data = fr.fastq_reader_with_spike(settings.FASTQ_FILE,
                                                 settings.LEFT_TRIM,
-                                                settings.RIGHT_TRIM)
+                                                settings.RIGHT_TRIM,
+                                                settings.UMI_LENGTH)
 
         # Retrieve all possible barcode and spike-in combinations
         print("Create dict of all possible combinations",
