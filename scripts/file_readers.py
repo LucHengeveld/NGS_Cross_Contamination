@@ -20,13 +20,13 @@ def fastq_reader_no_spike(fastq_path, umi_length):
             if umi_length == 0:
                 for line in fastq_file:
                     # If line starts with a @ it retrieves the barcode
-                    if line.startswith("@"):
+                    if line.startswith("@") and "N" not in line.split(":")[-1]:
                         fastq_data.append(line.replace("\n", "").
                                           split(":")[-1])
             else:
                 for line in fastq_file:
                     # If line starts with a @ it retrieves the barcode
-                    if line.startswith("@"):
+                    if line.startswith("@") and "N" not in line.split(":")[-1]:
                         # Retrieves the UMI sequence from the header
                         umi = line.replace("\n", "").split(":")[-1].\
                             split("+")[1][-umi_length:]
@@ -37,7 +37,7 @@ def fastq_reader_no_spike(fastq_path, umi_length):
                             fastq_data.append(line.replace("\n", "").
                                               split(":")[-1])
         if len(fastq_data) == 0:
-            print("Error 15: Fasta file format is incorrect. No headers"
+            print("Error 15: Fasta file format is incorrect. No headers "
                   "found.")
             exit(15)
 
@@ -124,7 +124,7 @@ def fastq_reader_with_spike(fastq_path, trim_left, trim_right, umi_length):
             if umi_length == 0:
                 for line in fastq_file:
                     # If line starts with a @ it retrieves the barcode
-                    if line.startswith("@"):
+                    if line.startswith("@") and "N" not in line.split(":")[-1]:
                         templist = line.replace("\n", "").split(":")[-1].\
                             split("+")
 
@@ -139,7 +139,7 @@ def fastq_reader_with_spike(fastq_path, trim_left, trim_right, umi_length):
                 umi_bool = False
                 for line in fastq_file:
                     # If line starts with a @ it retrieves the barcode
-                    if line.startswith("@"):
+                    if line.startswith("@") and "N" not in line.split(":")[-1]:
                         templist = line.replace("\n", "").split(":")[-1].split(
                             "+")
                         # Checks if UMI has been found in previous reads
