@@ -15,14 +15,14 @@ INDEXING = 2
 # (1) i5 + i7
 # (2) Spike ins + i5
 # (3) Spike ins + i7
-# (4) Spike ins + i7 and spike ins + i5
+# (4) Spike ins + i7 and spike ins + i5 (both separately)
 # (5) Spike ins + i5 + i7
 ANALYSE_COMBINATION = 1
 
 # What would you like to analyse?
-# (1) Known and unknown barcodes / spike-in sequences
-# (2) Only known barcodes / spike-in sequences
-# (3) Only unknown barcodes / spike-in sequences
+# (1) Known and unknown barcodes (and spike-in sequences)
+# (2) Only known barcodes (and spike-in sequences)
+# (3) Only unknown barcodes (and spike-in sequences)
 ANALYSE_TYPE = 1
 
 # Which sequencer has been used?
@@ -56,8 +56,7 @@ UMI_LENGTH = 1
 # --- Spike-ins ---
 # Enter a 0 as value for the parameters below if you are not using spike-in sequences.
 
-# If using spike-ins: how many nucleotides are the found spike-in sequences allowed to differ from
-# the original sequences?
+# If using spike-ins: how many nucleotides are the found spike-in sequences allowed to differ from the original sequences?
 SPIKE_DIFF = 0
 
 # If using spike-ins: how many nucleotides should be trimmed from the left end?
