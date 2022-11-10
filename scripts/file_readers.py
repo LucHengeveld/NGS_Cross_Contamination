@@ -39,7 +39,9 @@ def fastq_reader_no_spike(fastq_path, umi_length):
                         if umi not in umi_set:
                             umi_set.add(umi)
                             fastq_data.append(line.replace("\n", "").
-                                              split(":")[-1])
+                                              split(":")[-1].
+                                              replace(umi+"+", "+"))
+
         if len(fastq_data) == 0:
             print("Error 15: Fasta file format is incorrect. No headers "
                   "found.")
@@ -144,8 +146,8 @@ def fastq_reader_with_spike(fastq_path, trim_left, trim_right, umi_length):
                 for line in fastq_file:
                     # If line starts with a @ it retrieves the barcode
                     if line.startswith("@") and "N" not in line.split(":")[-1]:
-                        templist = line.replace("\n", "").split(":")[-1].split(
-                            "+")
+                        templist = line.replace("\n", "").split(":")[-1].\
+                            split("+")
                         # Checks if UMI has been found in previous reads
                         if templist[0][-umi_length:] in umi_set:
                             umi_bool = True
