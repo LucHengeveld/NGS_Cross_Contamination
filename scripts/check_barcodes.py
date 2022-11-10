@@ -27,7 +27,7 @@ def comp_barcodes(fastq_data, barc_diff, correct_i5_list, correct_i7_list,
 
     # Loops through the barcodes from the fastq file
     for barcode in fastq_data:
-        i5, i7 = barcode.split("+")
+        i7, i5 = barcode.split("+")
 
         # Checks if the barcode from the fastq file exists in the
         # entered barcode file
@@ -189,7 +189,7 @@ def add_both_barc_spike(i5_bool, i5, i7_bool, i7, spike_bool, spike,
     """
     # Checks if the i5 and spike booleans are true
     if spike_bool and i5_bool:
-        #         # Counts up combination value
+        # Counts up combination value
         combinations[i5][spike] += 1
 
     # Checks if the i7 and spike booleans are true
@@ -260,7 +260,7 @@ def comp_i5_i7_spike(combinations, correct_spike_list, correct_i5_list,
 
             # Checks if the barcodes and spike booleans are true
             if i5_bool and i7_bool and spike_bool:
-                barc = i5 + "+" + i7
+                barc = i7 + "+" + i5
                 # Counts up combination value
                 combinations[barc][spike] += 1
             else:
@@ -277,7 +277,7 @@ def comp_i5_i7_spike(combinations, correct_spike_list, correct_i5_list,
                 correct_i5_list, correct_i7_list, read[0], read[1], barc_diff)
 
             # Saves the i5 and i7 barcodes as variables
-            i5, i7 = barcode.split("+")
+            i7, i5 = barcode.split("+")
 
             # Checks if the barcodes and spike booleans are true
             if bar_bool and spike_bool:
@@ -385,8 +385,7 @@ def seq_checker_uniq_i5_i7_spike(correct_i5_list, correct_i7_list, i5, i7,
     :return barcode: Barcode from one specific read or what it should have been
             if x nucleotide(s) is/are allowed to differ.
     """
-    barcode = i5 + "+" + i7
-
+    barcode = i7 + "+" + i5
     if barc_diff == 0:
         try:
             if correct_i5_list.index(i5) == correct_i7_list.index(i7):
@@ -399,7 +398,7 @@ def seq_checker_uniq_i5_i7_spike(correct_i5_list, correct_i7_list, i5, i7,
         for i in range(len(correct_i5_list)):
             if distance(i5, correct_i5_list[i]) <= barc_diff and \
                     distance(i7, correct_i7_list[i]) <= barc_diff:
-                return True, correct_i5_list[i] + "+" + correct_i7_list[i]
+                return True, correct_i7_list[i] + "+" + correct_i5_list[i]
         return False, barcode
 
 
@@ -420,7 +419,7 @@ def retrieve_combinations_no_spike(barcode_file_list):
 
     # Splits the barcodes from the Excel file into i5 and i7
     for line in barcode_file_list:
-        i5, i7 = line[1].split("+")
+        i7, i5 = line[1].split("+")
         correct_i5_list.append(i5)
         correct_i7_list.append(i7)
 
@@ -465,7 +464,7 @@ def retrieve_combinations_with_spike(barcode_file_dict, analyse_combination):
 
     # Splits the barcodes from the Excel file into i5 and i7
     for barcode in barcode_file_dict:
-        i5, i7 = barcode.split("+")
+        i7, i5 = barcode.split("+")
         correct_i5_list.append(i5)
         correct_i7_list.append(i7)
         correct_spike_list.append(barcode_file_dict[barcode][1])
@@ -509,7 +508,7 @@ def retrieve_combinations_with_spike(barcode_file_dict, analyse_combination):
         # dictionary
         for bar_index in range(len(correct_i5_list)):
             for spike_seq in correct_spike_list:
-                barcode = correct_i5_list[bar_index] + "+" + correct_i7_list[
+                barcode = correct_i7_list[bar_index] + "+" + correct_i5_list[
                     bar_index]
                 if barcode not in combinations:
                     combinations[barcode] = {spike_seq: 0}
@@ -537,7 +536,7 @@ def retrieve_barcode_location(barcode_file_data):
     for barcode in barcode_file_data:
         i5_loc = re.split("(\d+)", barcode[0])[0]
         i7_loc = int(re.split("(\d+)", barcode[0])[1])
-        i5_bar, i7_bar = barcode[1].split("+")
+        i7_bar, i5_bar = barcode[1].split("+")
 
         # Adds the barcodes and their well locations to the dictionary
         if i5_bar not in i5_i7_loc:

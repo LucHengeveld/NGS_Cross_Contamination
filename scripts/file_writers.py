@@ -517,8 +517,8 @@ def fw_i5_i7_spike(correct_i5_list, correct_i7_list,
 
     # Adds all barcodes and occurrences to the Excel 2d list
     for i in range(len(correct_i5_list)):
-        barcode = correct_i5_list[i] + "+" + correct_i7_list[i]
-        excel_2d_list[1].append(barcode)
+        excel_2d_list[1].append(correct_i5_list[i] + "+" + correct_i7_list[i])
+        barcode = correct_i7_list[i] + "+" + correct_i5_list[i]
         for j in range(len(correct_spike_list)):
             spike = correct_spike_list[j]
             excel_2d_list[j + 2].append(combinations[barcode][spike])

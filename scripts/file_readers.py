@@ -13,6 +13,9 @@ def fastq_reader_no_spike(fastq_path, umi_length):
     # Creates an empty list and set
     fastq_data = []
     umi_set = set()
+
+    # TODO: Save homopolymers to seperate list
+    homopolymers = ["AAA", "TTT", "GGG", "CCC"]
     try:
         # Opens the .fastq and reads it line by line
         with open(fastq_path, "r") as fastq_file:
@@ -21,15 +24,16 @@ def fastq_reader_no_spike(fastq_path, umi_length):
                 for line in fastq_file:
                     # If line starts with a @ it retrieves the barcode
                     if line.startswith("@") and "N" not in line.split(":")[-1]:
-                        fastq_data.append(line.replace("\n", "").
-                                          split(":")[-1])
+                        if not any(homopolymer in line.split(":")[-1] for
+                                   homopolymer in homopolymers):
+                            fastq_data.append(line.replace("\n", "").split(":")[-1])
             else:
                 for line in fastq_file:
                     # If line starts with a @ it retrieves the barcode
                     if line.startswith("@") and "N" not in line.split(":")[-1]:
                         # Retrieves the UMI sequence from the header
                         umi = line.replace("\n", "").split(":")[-1].\
-                            split("+")[1][-umi_length:]
+                            split("+")[0][-umi_length:]
                         # Adds the barcodes to a list if UMI has not
                         # been found in previous reads
                         if umi not in umi_set:
@@ -84,14 +88,14 @@ def barcode_file_reader(barcode_file, sequencing_method, analyse_combination):
         if analyse_combination == 1:
             # Retrieve barcodes from the Excel file
             for row in sheet.iter_rows(min_row=4, values_only=True):
-                barcode_file_list.append([row[0], row[i5] + "+" + row[4]])
+                barcode_file_list.append([row[0], row[4] + "+" + row[i5]])
             # Returns the barcode_file_list
             return barcode_file_list
 
         else:
             # Retrieve barcodes and spike-in sequences from the Excel file
             for row in sheet.iter_rows(min_row=4, values_only=True):
-                barcode = row[i5] + "+" + row[4]
+                barcode = row[4] + "+" + row[i5]
                 barcode_file_dict[barcode] = [row[0], row[-1], 0]
             # Returns the barcode_file_dict
             return barcode_file_dict
@@ -143,13 +147,13 @@ def fastq_reader_with_spike(fastq_path, trim_left, trim_right, umi_length):
                         templist = line.replace("\n", "").split(":")[-1].split(
                             "+")
                         # Checks if UMI has been found in previous reads
-                        if templist[1][-umi_length:] in umi_set:
+                        if templist[0][-umi_length:] in umi_set:
                             umi_bool = True
                         else:
                             umi_bool = False
                             # Adds the UMI sequence to a set
-                            umi_set.add(templist[1][-umi_length:])
-                            templist[1] = templist[1][:-umi_length]
+                            umi_set.add(templist[0][-umi_length:])
+                            templist[0] = templist[0][:-umi_length]
                     elif not umi_bool:
                         # Checks if line contains only letters and saves it to
                         # a variable
