@@ -92,7 +92,7 @@ def comp_bar_spike(combinations, correct_spike_list, correct_i5_list,
         if analyse_combination == 2:
             # Checks if found i5 barcode exist in barcode + spike-in
             # file
-            i5_bool, i5 = seq_checker(correct_i5_list, read[0], barc_diff)
+            i5_bool, i5 = seq_checker(correct_i5_list, read[1], barc_diff)
 
             # Adds the i5 and spike-in to the combinations or unknown
             # dictionary
@@ -103,7 +103,7 @@ def comp_bar_spike(combinations, correct_spike_list, correct_i5_list,
         elif analyse_combination == 3:
             # Checks if found i7 barcode exist in barcode + spike-in
             # file
-            i7_bool, i7 = seq_checker(correct_i7_list, read[1], barc_diff)
+            i7_bool, i7 = seq_checker(correct_i7_list, read[0], barc_diff)
 
             # Adds the i7 and spike-in to the combinations or unknown
             # dictionary
@@ -114,8 +114,8 @@ def comp_bar_spike(combinations, correct_spike_list, correct_i5_list,
         else:
             # Checks if found i5 and i7 barcodes exist in barcode + spike-in
             # file
-            i5_bool, i5 = seq_checker(correct_i5_list, read[0], barc_diff)
-            i7_bool, i7 = seq_checker(correct_i7_list, read[1], barc_diff)
+            i5_bool, i5 = seq_checker(correct_i5_list, read[1], barc_diff)
+            i7_bool, i7 = seq_checker(correct_i7_list, read[0], barc_diff)
 
             # Adds the barcodes and spike-in sequence to the
             # combinations or unknown dictionary
@@ -273,20 +273,20 @@ def comp_i5_i7_spike(combinations, correct_spike_list, correct_i5_list,
         else:
             # Checks if the i5 and i7 sequences exist in the entered
             # barcode file
-            bar_bool, barcode = seq_checker_uniq_i5_i7_spike(
-                correct_i5_list, correct_i7_list, read[0], read[1], barc_diff)
+            i5_bool, i7_bool, cor_comb_bool, barcode = seq_checker_uniq_i5_i7_spike(
+                correct_i5_list, correct_i7_list, read[1], read[0], barc_diff)
 
             # Saves the i5 and i7 barcodes as variables
             i7, i5 = barcode.split("+")
 
             # Checks if the barcodes and spike booleans are true
-            if bar_bool and spike_bool:
+            if cor_comb_bool and spike_bool:
                 # Counts up combination value
                 combinations[barcode][spike] += 1
             else:
                 unknown_dict = write_unknown_i5_i7_spike(unknown_dict, i5, i7,
-                                                         spike, bar_bool,
-                                                         bar_bool, spike_bool)
+                                                         spike, i5_bool,
+                                                         i7_bool, spike_bool)
 
     # Returns the updated combinations and unknown dictionaries
     return combinations, unknown_dict
@@ -385,21 +385,57 @@ def seq_checker_uniq_i5_i7_spike(correct_i5_list, correct_i7_list, i5, i7,
     :return barcode: Barcode from one specific read or what it should have been
             if x nucleotide(s) is/are allowed to differ.
     """
-    barcode = i7 + "+" + i5
+    # TODO: Comments
     if barc_diff == 0:
-        try:
+        barcode = i7 + "+" + i5
+        if i5 in correct_i5_list:
+            i5_bool = True
+        else:
+            i5_bool = False
+
+        if i7 in correct_i7_list:
+            i7_bool = True
+        else:
+            i7_bool = False
+
+        if i5_bool and i7_bool:
             if correct_i5_list.index(i5) == correct_i7_list.index(i7):
-                return True, barcode
+                cor_comb_bool = True
             else:
-                return False, barcode
-        except ValueError:
-            return False, barcode
+                cor_comb_bool = False
+        else:
+            cor_comb_bool = False
+
+        return i5_bool, i7_bool, cor_comb_bool, barcode
+
     else:
         for i in range(len(correct_i5_list)):
-            if distance(i5, correct_i5_list[i]) <= barc_diff and \
-                    distance(i7, correct_i7_list[i]) <= barc_diff:
-                return True, correct_i7_list[i] + "+" + correct_i5_list[i]
-        return False, barcode
+            if distance(i5, correct_i5_list[i]) <= barc_diff:
+                i5_bool = True
+                i5 = correct_i5_list[i]
+                break
+            else:
+                i5_bool = False
+
+        for i in range(len(correct_i7_list)):
+            if distance(i7, correct_i7_list[i]) <= barc_diff:
+                i7_bool = True
+                i7 = correct_i7_list[i]
+                break
+            else:
+                i7_bool = False
+
+        if i5_bool and i7_bool:
+            if correct_i5_list.index(i5) == correct_i7_list.index(i7):
+                cor_comb_bool = True
+            else:
+                cor_comb_bool = False
+        else:
+            cor_comb_bool = False
+
+        barcode = i7 + "+" + i5
+
+        return i5_bool, i7_bool, cor_comb_bool, barcode
 
 
 def retrieve_combinations_no_spike(barcode_file_list):
