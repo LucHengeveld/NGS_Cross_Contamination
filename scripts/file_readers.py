@@ -7,7 +7,7 @@ def fastq_reader_no_spike(fastq_path, umi_length):
     Reads and saves the info from the .fastq file to a list.
     :param fastq_path: Path to the .fastq file.
     :param umi_length: Length of the unique molecular identifier. Entered by
-        user in settings.py.
+            user in settings.py.
     :return fastq_data: List with the structure [barcode 1, barcode2, etc].
     """
     # Creates an empty list and set
@@ -115,7 +115,7 @@ def fastq_reader_with_spike(fastq_path, trim_left, trim_right, umi_length):
     :param trim_left: Parameter to trim the left side of the spike sequence.
     :param trim_right: Parameter to trim the right side of the spike sequence.
     :param umi_length: Length of the unique molecular identifier. Entered by
-        user in settings.py.
+            user in settings.py.
     :return fastq_data: List with the structure [[i5, i7, sequence], [i5, i7,
             sequence], etc].
     """

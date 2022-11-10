@@ -380,24 +380,35 @@ def seq_checker_uniq_i5_i7_spike(correct_i5_list, correct_i7_list, i5, i7,
     :param i5: i5 barcode sequence from one specific read.
     :param i7: i7 barcode sequence from one specific read.
     :param barc_diff: Parameter BARC_DIFF from settings.py.
-    :return boolean: Boolean that tells if the barcode has been found in the
+    :return i5_bool: Boolean that tells if the i5 barcode has been found in the
             barcode file.
+    :return i7_bool: Boolean that tells if the i7 barcode has been found in the
+            barcode file.
+    :return cor_comb_bool: Boolean that tells if the i5 and i7 barcode
+            combination is correct.
     :return barcode: Barcode from one specific read or what it should have been
             if x nucleotide(s) is/are allowed to differ.
     """
-    # TODO: Comments
+    # Checks the barcode nucleotide difference parameter
     if barc_diff == 0:
+
+        # Saves the barcode as a string
         barcode = i7 + "+" + i5
+
+        # Checks if the fastq i5 barcode exists in the barcode file
         if i5 in correct_i5_list:
             i5_bool = True
         else:
             i5_bool = False
 
+        # Checks if the fastq i7 barcode exists in the barcode file
         if i7 in correct_i7_list:
             i7_bool = True
         else:
             i7_bool = False
 
+        # Checks if both barcodes have been found and if they are the
+        # correct combinations
         if i5_bool and i7_bool:
             if correct_i5_list.index(i5) == correct_i7_list.index(i7):
                 cor_comb_bool = True
@@ -406,9 +417,12 @@ def seq_checker_uniq_i5_i7_spike(correct_i5_list, correct_i7_list, i5, i7,
         else:
             cor_comb_bool = False
 
+        # Returns the booleans and barcode
         return i5_bool, i7_bool, cor_comb_bool, barcode
 
     else:
+        # Checks if the fastq i5 barcode exists in the barcode file by using
+        # the entered barcode nucleotide difference value
         for i in range(len(correct_i5_list)):
             if distance(i5, correct_i5_list[i]) <= barc_diff:
                 i5_bool = True
@@ -417,6 +431,8 @@ def seq_checker_uniq_i5_i7_spike(correct_i5_list, correct_i7_list, i5, i7,
             else:
                 i5_bool = False
 
+        # Checks if the fastq i7 barcode exists in the barcode file by using
+        # the entered barcode nucleotide difference value
         for i in range(len(correct_i7_list)):
             if distance(i7, correct_i7_list[i]) <= barc_diff:
                 i7_bool = True
@@ -425,6 +441,8 @@ def seq_checker_uniq_i5_i7_spike(correct_i5_list, correct_i7_list, i5, i7,
             else:
                 i7_bool = False
 
+        # Checks if both barcodes have been found and if they are the
+        # correct combinations
         if i5_bool and i7_bool:
             if correct_i5_list.index(i5) == correct_i7_list.index(i7):
                 cor_comb_bool = True
@@ -433,8 +451,10 @@ def seq_checker_uniq_i5_i7_spike(correct_i5_list, correct_i7_list, i5, i7,
         else:
             cor_comb_bool = False
 
+        # Saves the barcode as a string
         barcode = i7 + "+" + i5
 
+        # Returns the booleans and barcode
         return i5_bool, i7_bool, cor_comb_bool, barcode
 
 

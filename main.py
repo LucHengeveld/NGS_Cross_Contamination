@@ -115,6 +115,7 @@ def main():
                 combinations, correct_spike_list, correct_i5_list,
                 correct_i7_list, fastq_data, settings.BARC_DIFF,
                 settings.SPIKE_DIFF, settings.INDEXING)
+
         else:
             #  Unique i5+i7+spike
             combinations, unknown_dict = cb.comp_i5_i7_spike(
