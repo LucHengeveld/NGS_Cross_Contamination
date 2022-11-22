@@ -19,12 +19,6 @@ INDEXING = 2
 # (5) Spike ins + i5 + i7
 ANALYSE_COMBINATION = 1
 
-# What would you like to analyse?
-# (1) Known and unknown barcodes (and spike-in sequences)
-# (2) Only known barcodes (and spike-in sequences)
-# (3) Only unknown barcodes (and spike-in sequences)
-ANALYSE_TYPE = 1
-
 # Which sequencer has been used?
 # (1) iSeq / MiniSeq / NextSeq / HiSeq3000 / HiSeq4000
 # (2) MiSeq / HiSeq2000-2500 / Novaseq
@@ -36,11 +30,14 @@ BARC_DIFF = 0
 # What is the maximum percentage of contamination compared to the amount of correct reads? Please use the following format:
 # Write 1 for 1% max contamination
 # Write 0.1 (seperated by a dot) for 0.1% max contamination
-MAX_CONTAMINATION = 0.0001
+MAX_CONTAMINATION = 0.1
+
+# What is the maximum allowed homopolymer length in a barcode? Barcodes that contain longer homopolymers get saved to a separate Excel sheet.
+# Enter a 0 to disable this function (increases program speed).
+HOMOPOLYMER_LENGTH = 0
 
 # In which directory would you like to save the output file?
-OUTPUT_DIR = 'output\\no-spike\\'
-# OUTPUT_DIR = 'output\\with-spike\\'
+OUTPUT_DIR = 'output\\test\\'
 
 # What name would you like to use for the output file?
 OUTPUT_FILENAME = 'comb_test'
