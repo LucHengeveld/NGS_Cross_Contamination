@@ -16,8 +16,6 @@ def main():
     #  line instead of saving it to a list first or pass every 100 000 lines
     #  parallel to compare function
 
-    # TODO: Implement parameters ANALYSE_TYPE
-
     # Checks if the parameters have been entered correctly by the user
     print("Check parameters", time.strftime("%H:%M"))
     settings = pm.check_parameters()
@@ -38,8 +36,9 @@ def main():
 
         # Retrieve barcodes from fastq file
         print("Retrieve barcodes from fastq file", time.strftime("%H:%M"))
-        fastq_data = fr.fastq_reader_no_spike(settings.FASTQ_FILE,
-                                              settings.UMI_LENGTH)
+        fastq_data, homopolymers = fr.fastq_reader_no_spike(
+            settings.FASTQ_FILE, settings.UMI_LENGTH,
+            settings.HOMOPOLYMER_LENGTH)
 
         # Retrieve all possible barcode combinations
         print("Retrieve barcodes from barcode file", time.strftime("%H:%M"))
@@ -65,7 +64,8 @@ def main():
             fw.no_spike_output(i5_i7_combinations, unknown_barcodes,
                                output_file, i5_i7_loc, settings.INDEXING,
                                settings.MAX_CONTAMINATION,
-                               settings.ANALYSE_COMBINATION)
+                               settings.ANALYSE_COMBINATION, homopolymers,
+                               settings.HOMOPOLYMER_LENGTH)
         else:
             # Write data to Excel output file
             print("Write uniq data to excel output file",
@@ -73,22 +73,25 @@ def main():
             fw.no_spike_output(i5_i7_combinations, unknown_barcodes,
                                output_file, [], settings.INDEXING,
                                settings.MAX_CONTAMINATION,
-                               settings.ANALYSE_COMBINATION)
+                               settings.ANALYSE_COMBINATION, homopolymers,
+                               settings.HOMOPOLYMER_LENGTH)
     else:
         # Retrieve the fastq data
         print("Retrieve barcodes and sequences from fastq file",
               time.strftime("%H:%M"))
-        fastq_data = fr.fastq_reader_with_spike(settings.FASTQ_FILE,
-                                                settings.LEFT_TRIM,
-                                                settings.RIGHT_TRIM,
-                                                settings.UMI_LENGTH)
+        fastq_data, homopolymers = fr.fastq_reader_with_spike(
+            settings.FASTQ_FILE,
+            settings.LEFT_TRIM,
+            settings.RIGHT_TRIM,
+            settings.UMI_LENGTH,
+            settings.HOMOPOLYMER_LENGTH)
 
         # Retrieve all possible barcode and spike-in combinations
         print("Create dict of all possible combinations",
               time.strftime("%H:%M"))
         combinations, correct_spike_list, correct_i5_list, correct_i7_list, \
-        well_locations = cb.retrieve_combinations_with_spike(
-            barcode_file_data, settings.ANALYSE_COMBINATION)
+            well_locations = cb.retrieve_combinations_with_spike(
+                barcode_file_data, settings.ANALYSE_COMBINATION)
 
         # Compare all fastq barcodes to the ones found in the barcode +
         # spike-in file

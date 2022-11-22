@@ -4,7 +4,7 @@ import xlsxwriter
 
 def no_spike_output(i5_i7_combinations, unknown_barcodes, output_file,
                     i5_i7_loc, indexing, max_contamination,
-                    analyse_combination):
+                    analyse_combination, homopolymers, homopolymer_length):
     """
     Creates the output Excel file for unique dual (non-redundant) indexing with
     no spike-in sequence.
@@ -20,6 +20,10 @@ def no_spike_output(i5_i7_combinations, unknown_barcodes, output_file,
     :param indexing: Parameter of the used indexing method.
     :param max_contamination: Parameter of the maximum allowed contamination.
     :param analyse_combination: Parameter from settings.py.
+    :param homopolymers: Dictionary containing all found homopolymers. Has the
+        structure {"A": {barcode 1: count, barcode 2: count}, "T": {barcode 1:
+        count, barcode 2: count}, etc}.
+    :param homopolymer_length: Maximum length of homopolymers within barcodes.
     :return: Excel output file at entered location.
     """
     # Create base layout in 2d list for Excel output file
@@ -81,7 +85,7 @@ def no_spike_output(i5_i7_combinations, unknown_barcodes, output_file,
                                        "Occurrences:"], bold)
 
         # Sets the Excel column width
-        unknown_sheet.set_column("A:E", 12)
+        unknown_sheet.set_column("A:E", 20)
 
         row = 1
         for i5 in unknown_barcodes:
@@ -91,6 +95,25 @@ def no_spike_output(i5_i7_combinations, unknown_barcodes, output_file,
                                                  unknown_barcodes[i5][i7][1],
                                                  unknown_barcodes[i5][i7][2]])
                 row += 1
+
+        if homopolymer_length > 0:
+            for nucleotide in homopolymers:
+                homopolymer_sheet = workbook.add_worksheet(nucleotide +
+                                                           " homopolymers")
+                homopolymer_sheet.write_row(0, 0, ["i5 barcodes:",
+                                                   "i7 barcodes:",
+                                                   "Occurrences:"], bold)
+                # Sets the Excel column width
+                homopolymer_sheet.set_column("A:C", 20)
+
+                row = 1
+                for barcode in homopolymers[nucleotide]:
+                    i7, i5 = barcode.split("+")
+                    homopolymer_sheet.write_row(row, 0, [i5, i7,
+                                                         homopolymers[
+                                                             nucleotide][
+                                                             barcode]])
+                    row += 1
 
 
 def con_table_writer(workbook, excel_2d_list, contamination_table, indexing,
@@ -211,6 +234,7 @@ def spike_outputs(correct_i5_list, correct_i7_list, correct_spike_list,
                   well_locations, combinations, output_file,
                   analyse_combination, unknown_dict, indexing,
                   max_contamination):
+    # TODO: Write homopolymers to Excel sheet for barcodes with spike-ins
     """
     Calls the different file writers depending on the entered parameters.
     :param correct_i5_list: List with all i5 barcodes from the entered barcode
@@ -406,13 +430,14 @@ def fw_both_bar_spike(correct_i5_list, correct_i7_list,
 
         # Creates a new Excel tab named Unknown combinations
         unknown_sheet = workbook.add_worksheet("Unknown combinations")
-        unknown_sheet.set_column("A:G", 12)
+        unknown_sheet.set_column("A:G", 20)
 
         # Adds unknown i5, i7 and spike-in row names
         unknown_sheet.write_row(0, 0, ["i5 barcodes:", "i7 barcodes:",
                                        "Spike-ins:", "i5 known:", "i7 known:",
                                        "Spike-in known:", "Occurrences:"], bold
                                 )
+
         # Writes the unknown data to the unknown Excel tab
         row = 1
         for i5 in unknown_dict:
@@ -561,6 +586,7 @@ def fw_i5_i7_spike(correct_i5_list, correct_i7_list,
                                        "Spike-in known:", "Occurrences:"], bold
                                 )
 
+        # Writes the unknown data to the unknown Excel tab
         row = 1
         for i5 in unknown_dict:
             for i7 in unknown_dict[i5]:
