@@ -1,7 +1,75 @@
 # NGS_Cross_Contamination
 
 ## Code manual:
-### TODO: Add a manual on how to use the program. 
+
+### Windows:
+1) Download Python and select add to PATH in installer (3.10 has been used to create this project)
+   - Check if python is installed correctly with the command 'py --version'
+
+2) Open a terminal:
+   - Type cmd in your windows search bar.
+
+3) Check if pip is installed with the following command:
+   - py -m pip --version
+   - Skip step 4 and 5 if pip is installed.
+
+4) If pip has not been installed, try running the following commands:
+   - py -m ensurepip --default-pip 
+   - py -m pip --version
+
+5) If that still doesn't work, manually download pip from https://bootstrap.pypa.io/get-pip.py and run the following command:
+   - python get-pip.py
+
+6) Ensure pip, setuptools and wheel are up-to-date with the following command:
+   - py -m pip install --upgrade pip setuptools wheel
+
+7) Install the required packages from requirements.txt:
+   - By double-clicking the windows_packages.bat file;
+   - or by using the command 'pip install (packagename==version)'
+
+8) Open the settings.py file with a text editor like notepad:
+   - Edit the parameters and save the file.
+
+9) Open a terminal in the project directory by right-clicking:
+   - Show more options -> open in terminal
+
+10) Run main.py by using the following command:
+    - python main.py
+
+
+### Linux:
+1) Download Python and select add to PATH in installer (3.10 has been used to create this project)
+   - Check if python is installed correctly with the command 'python3 --version'
+
+2) Open a terminal:
+   - Type terminal in your linux search bar.
+
+3) Check if pip is installed with the following command:
+   - python3 -m pip --version
+   - Skip step 4 and 5 if pip is installed.
+
+4) If pip has not been installed, try running the following commands:
+   - python3 -m ensurepip --default-pip
+   - python3 -m pip --version
+
+5) If that still doesn't work, manually download pip from https://bootstrap.pypa.io/get-pip.py and run the following command:
+   - python3 get-pip.py
+
+6) Ensure pip, setuptools and wheel are up-to-date with the following command:
+   - python3 -m pip install --upgrade pip setuptools wheel
+
+7) Install the required packages from requirements.txt:
+   - By using the command bash linux_packages.sh;
+   - or by using the command 'pip install (packagename==version)'
+
+8) Open the settings.py file with a text editor:
+   - Edit the parameters and save the file.
+
+9) Open a terminal in the project directory by right-clicking:
+   - Open in terminal
+
+10) Run main.py by using the following command:
+    - python3 main.py
 
 ## List of errors that can occur when running the code:
 1) parameters.py - Error 1: Entered fastq file has incorrect file extension.
