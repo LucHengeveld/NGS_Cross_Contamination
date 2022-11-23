@@ -223,11 +223,8 @@ def homopolymer_check(homopolymer_length, barcode, homopolymers):
         structure {"A": {barcode 1: count, barcode 2: count}, "T": {barcode 1:
         count, barcode 2: count}, etc}.
     """
-    # Creates a list
-    nucleotide_list = ["A", "T", "C", "G"]
-
     # Loops through the nucleotide list
-    for nucleotide in nucleotide_list:
+    for nucleotide in homopolymers:
         # Checks if barcode sequence contains a homopolymer
         if nucleotide * (homopolymer_length + 1) in barcode:
             # Saves the barcode to the homopolymer dictionary

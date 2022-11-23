@@ -131,7 +131,8 @@ def main():
                          well_locations, combinations, output_file,
                          settings.ANALYSE_COMBINATION, unknown_dict,
                          settings.INDEXING,
-                         settings.MAX_CONTAMINATION)
+                         settings.MAX_CONTAMINATION, homopolymers,
+                         settings.HOMOPOLYMER_LENGTH)
 
 
 if __name__ == "__main__":

@@ -97,23 +97,7 @@ def no_spike_output(i5_i7_combinations, unknown_barcodes, output_file,
                 row += 1
 
         if homopolymer_length > 0:
-            for nucleotide in homopolymers:
-                homopolymer_sheet = workbook.add_worksheet(nucleotide +
-                                                           " homopolymers")
-                homopolymer_sheet.write_row(0, 0, ["i5 barcodes:",
-                                                   "i7 barcodes:",
-                                                   "Occurrences:"], bold)
-                # Sets the Excel column width
-                homopolymer_sheet.set_column("A:C", 20)
-
-                row = 1
-                for barcode in homopolymers[nucleotide]:
-                    i7, i5 = barcode.split("+")
-                    homopolymer_sheet.write_row(row, 0, [i5, i7,
-                                                         homopolymers[
-                                                             nucleotide][
-                                                             barcode]])
-                    row += 1
+            homopolymer_sheets(homopolymers, workbook, bold)
 
 
 def con_table_writer(workbook, excel_2d_list, contamination_table, indexing,
@@ -233,8 +217,7 @@ def con_table_writer(workbook, excel_2d_list, contamination_table, indexing,
 def spike_outputs(correct_i5_list, correct_i7_list, correct_spike_list,
                   well_locations, combinations, output_file,
                   analyse_combination, unknown_dict, indexing,
-                  max_contamination):
-    # TODO: Write homopolymers to Excel sheet for barcodes with spike-ins
+                  max_contamination, homopolymers, homopolymer_length):
     """
     Calls the different file writers depending on the entered parameters.
     :param correct_i5_list: List with all i5 barcodes from the entered barcode
@@ -253,48 +236,45 @@ def spike_outputs(correct_i5_list, correct_i7_list, correct_spike_list,
             spike-in sequences.
     :param indexing: Parameter of the used indexing method.
     :param max_contamination: Parameter of the maximum allowed contamination.
+    :param homopolymers: Dictionary containing all found homopolymers. Has the
+        structure {"A": {barcode 1: count, barcode 2: count}, "T": {barcode 1:
+        count, barcode 2: count}, etc}.
+    :param homopolymer_length: Maximum length of homopolymers within barcodes.
     """
     # i5+spike
     if analyse_combination == 2:
-        if indexing == 1:
-            fw_bar_spike(correct_i5_list, correct_spike_list, well_locations,
-                         combinations, output_file, analyse_combination,
-                         unknown_dict, indexing, max_contamination)
-        else:
-            fw_bar_spike(correct_i5_list, correct_spike_list, well_locations,
-                         combinations, output_file, analyse_combination,
-                         unknown_dict, indexing, max_contamination)
+        fw_bar_spike(correct_i5_list, correct_spike_list, well_locations,
+                     combinations, output_file, analyse_combination,
+                     unknown_dict, indexing, max_contamination, homopolymers,
+                     homopolymer_length)
 
     # i7+spike
     elif analyse_combination == 3:
-        if indexing == 1:
-            fw_bar_spike(correct_i7_list, correct_spike_list, well_locations,
-                         combinations, output_file, analyse_combination,
-                         unknown_dict, indexing, max_contamination)
-        else:
-            fw_bar_spike(correct_i7_list, correct_spike_list, well_locations,
-                         combinations, output_file, analyse_combination,
-                         unknown_dict, indexing, max_contamination)
+        fw_bar_spike(correct_i7_list, correct_spike_list, well_locations,
+                     combinations, output_file, analyse_combination,
+                     unknown_dict, indexing, max_contamination, homopolymers,
+                     homopolymer_length)
 
     # i5+spike and i7+spike
     elif analyse_combination == 4:
         fw_both_bar_spike(correct_i5_list, correct_i7_list, correct_spike_list,
                           well_locations, combinations, output_file,
                           analyse_combination, unknown_dict, indexing,
-                          max_contamination)
+                          max_contamination, homopolymers, homopolymer_length)
 
     # i5+i7+spike
     else:
         fw_i5_i7_spike(correct_i5_list, correct_i7_list,
                        correct_spike_list, well_locations,
                        combinations, output_file, analyse_combination,
-                       unknown_dict, indexing, max_contamination)
+                       unknown_dict, indexing, max_contamination, homopolymers,
+                       homopolymer_length)
 
 
 def fw_bar_spike(correct_bar_list, correct_spike_list,
                  well_locations, combinations, output_file,
                  analyse_combination, unknown_dict, indexing,
-                 max_contamination):
+                 max_contamination, homopolymers, homopolymer_length):
     """
     Writes the output of i5+spike or i7+spike to an Excel file.
     :param correct_bar_list: List with all i5 or i7 barcodes from the entered
@@ -312,6 +292,10 @@ def fw_bar_spike(correct_bar_list, correct_spike_list,
             spike-in sequences.
     :param indexing: Parameter of the used indexing method.
     :param max_contamination: Parameter of the maximum allowed contamination.
+    :param homopolymers: Dictionary containing all found homopolymers. Has the
+        structure {"A": {barcode 1: count, barcode 2: count}, "T": {barcode 1:
+        count, barcode 2: count}, etc}.
+    :param homopolymer_length: Maximum length of homopolymers within barcodes.
     :return: Excel output file at entered location.
     """
     # Checks if i5+spike or i7+spike has been selected
@@ -369,11 +353,17 @@ def fw_bar_spike(correct_bar_list, correct_spike_list,
                                                  unknown_dict[bar][spike][2]])
                 row += 1
 
+        # Checks if user would like to analyse homopolymers
+        if homopolymer_length > 0:
+            # Calls function to write homopolymers to a Excel sheet
+            homopolymer_sheets(homopolymers, workbook, bold)
+
 
 def fw_both_bar_spike(correct_i5_list, correct_i7_list,
                       correct_spike_list, well_locations,
                       combinations, output_file, analyse_combination,
-                      unknown_dict, indexing, max_contamination):
+                      unknown_dict, indexing, max_contamination, homopolymers,
+                      homopolymer_length):
     """
     Creates the output Excel file for i5 + spike-ins and i7 + spike-ins.
     :param correct_i5_list: List with all i5 barcodes from the entered barcode
@@ -393,6 +383,10 @@ def fw_both_bar_spike(correct_i5_list, correct_i7_list,
             spike-in sequences.
     :param indexing: Parameter of the used indexing method.
     :param max_contamination: Parameter of the maximum allowed contamination.
+    :param homopolymers: Dictionary containing all found homopolymers. Has the
+        structure {"A": {barcode 1: count, barcode 2: count}, "T": {barcode 1:
+        count, barcode 2: count}, etc}.
+    :param homopolymer_length: Maximum length of homopolymers within barcodes.
     :return: Excel output file at entered location.
     """
     # Creates the base layout for the Excel contamination tab and saves
@@ -449,6 +443,11 @@ def fw_both_bar_spike(correct_i5_list, correct_i7_list,
                         unknown_dict[i5][i7][spike][2],
                         unknown_dict[i5][i7][spike][3]])
                     row += 1
+
+        # Checks if user would like to analyse homopolymers
+        if homopolymer_length > 0:
+            # Calls function to write homopolymers to a Excel sheet
+            homopolymer_sheets(homopolymers, workbook, bold)
 
 
 def excel_list_bar_spike(well_locations, excel_2d_list, correct_bar_list,
@@ -509,7 +508,8 @@ def excel_list_bar_spike(well_locations, excel_2d_list, correct_bar_list,
 def fw_i5_i7_spike(correct_i5_list, correct_i7_list,
                    correct_spike_list, well_locations, combinations,
                    output_file, analyse_combination, unknown_dict,
-                   indexing, max_contamination):
+                   indexing, max_contamination, homopolymers,
+                   homopolymer_length):
     """
     Writes the output of i5 + i7 + spike-ins to an Excel file.
     :param correct_i5_list: List with all i5 barcodes from the entered barcode
@@ -529,6 +529,10 @@ def fw_i5_i7_spike(correct_i5_list, correct_i7_list,
             spike-in sequences.
     :param indexing: Parameter of the used indexing method.
     :param max_contamination: Parameter of the maximum allowed contamination.
+    :param homopolymers: Dictionary containing all found homopolymers. Has the
+        structure {"A": {barcode 1: count, barcode 2: count}, "T": {barcode 1:
+        count, barcode 2: count}, etc}.
+    :param homopolymer_length: Maximum length of homopolymers within barcodes.
     :return: Excel output file at entered location.
     """
     # Creates the base structure of the Excel 2D list and saves the tab
@@ -598,6 +602,11 @@ def fw_i5_i7_spike(correct_i5_list, correct_i7_list,
                         unknown_dict[i5][i7][spike][3]])
                     row += 1
 
+        # Checks if user would like to analyse homopolymers
+        if homopolymer_length > 0:
+            # Calls function to write homopolymers to a Excel sheet
+            homopolymer_sheets(homopolymers, workbook, bold)
+
 
 def heatmap(excel_2d_list, i, j, workbook, max_con):
     """
@@ -636,3 +645,35 @@ def heatmap(excel_2d_list, i, j, workbook, max_con):
     # returns it
     bg_format = workbook.add_format({'bg_color': hex_color})
     return bg_format
+
+
+def homopolymer_sheets(homopolymers, workbook, bold):
+    """
+    Writes the homopolymers to an Excel sheet.
+    :param homopolymers: Dictionary containing all found homopolymers. Has the
+        structure {"A": {barcode 1: count, barcode 2: count}, "T": {barcode 1:
+        count, barcode 2: count}, etc}.
+    :param workbook: Excel workbook object to create the homopolymer sheets.
+    :param bold: Bold format for an Excel cell.
+    :return Homopolymer Excel sheets: Excel sheets containing lists of barcodes
+        containing homopolymers and their occurrences.
+    """
+    # Loops through the homopolymer dictionary keys
+    for nucleotide in homopolymers:
+        # Adds a new Excel sheet for every nucleotide (A, T, C, G)
+        homopolymer_sheet = workbook.add_worksheet(nucleotide +
+                                                   " homopolymers")
+        homopolymer_sheet.write_row(0, 0, ["i5 barcodes:",
+                                           "i7 barcodes:",
+                                           "Occurrences:"], bold)
+
+        # Sets the Excel column width
+        homopolymer_sheet.set_column("A:C", 20)
+
+        # Writes the homopolymers to Excel sheets
+        row = 1
+        for barcode in homopolymers[nucleotide]:
+            i7, i5 = barcode.split("+")
+            homopolymer_sheet.write_row(row, 0, [i5, i7, homopolymers[
+                nucleotide][barcode]])
+            row += 1
